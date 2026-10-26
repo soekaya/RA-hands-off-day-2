@@ -140,6 +140,7 @@ public class Health : MonoBehaviour
         if (CompareTag("Enemy") && LevelManager.instance != null)
         {
             LevelManager.instance.AddKill();
+            WaveManager.Instance.RegisterKill();
         }
 
         Vector3 bodyPos = transform.position + Vector3.up * (feedback.TopOffset * 0.5f);

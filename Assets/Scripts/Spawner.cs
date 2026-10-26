@@ -12,7 +12,7 @@ public class Spawner : MonoBehaviour
     [SerializeField] private int maxAlive = 12;             // 0 = no limit
 
     [Header("Enemy Selection (Normal Distribution)")]
-    [field:SerializeField, Range(0f, 1f)] public float EnemyBias { get; private set; } = 0f;
+    [SerializeField, Range(0f, 1f)] public float EnemyBias = 0f;
     [SerializeField, Range(0f, 1f)] private float stdDev = 0.15f;
     [SerializeField] private bool limitToOneStdDev = false;
 
@@ -57,6 +57,7 @@ public class Spawner : MonoBehaviour
 
         GameObject spawned = Instantiate(enemies[PickEnemyIndex()], position, Quaternion.identity);
         alive.Add(spawned);
+        WaveManager.Instance.RegisterSpawn();
     }
 
     private int PickEnemyIndex()

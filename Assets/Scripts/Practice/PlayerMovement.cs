@@ -15,24 +15,14 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
-        /*
-            CLUE:
-            Ambil input pergerakan pemain menggunakan Input.GetAxisRaw:
-            1. Isi variabel horizontal dengan Input.GetAxisRaw("Horizontal");
-            2. Isi variabel vertical dengan Input.GetAxisRaw("Vertical");
-        */
-        // Tulis kode di sini
+        horizontal = Input.GetAxis("Horizontal");
+        vertical = Input.GetAxis("Vertical");
     }
 
     private void FixedUpdate()
     {
         Vector2 movement = new Vector2(horizontal, vertical).normalized;
+        rb.linearVelocity = movement * moveSpeed;
 
-        /*
-            CLUE:
-            Gerakkan Player dengan mengatur linearVelocity pada Rigidbody2D:
-            rb.linearVelocity = movement * moveSpeed;
-        */
-        // Tulis kode di sini
     }
 }

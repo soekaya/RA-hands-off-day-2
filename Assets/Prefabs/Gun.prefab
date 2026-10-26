@@ -442,6 +442,7 @@ GameObject:
   - component: {fileID: 2297563420042122122}
   - component: {fileID: 1327492414269841641}
   - component: {fileID: 6120933548092979450}
+  - component: {fileID: 5317688892335411228}
   m_Layer: 0
   m_Name: Gun
   m_TagString: Gun
@@ -527,6 +528,21 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.83623224, y: 0.35325634}
   m_EdgeRadius: 0
+--- !u!114 &5317688892335411228
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5977857456764655884}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37d4ea918aa69ad4892678ad545844c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GunVisual
+  kickDistance: 0.15
+  kickAngle: 12
+  recover: 15
 --- !u!1 &8707217827059967942
 GameObject:
   m_ObjectHideFlags: 0

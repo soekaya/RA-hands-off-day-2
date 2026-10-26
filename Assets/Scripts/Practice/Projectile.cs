@@ -1,4 +1,3 @@
-
 using UnityEngine;
 
 public class Projectile : MonoBehaviour
@@ -19,22 +18,21 @@ public class Projectile : MonoBehaviour
 
     private void Move()
     {
-        /*
-            CLUE:
-            Gerakkan peluru maju ke depan/atas lokal menggunakan transform.Translate:
-            transform.Translate(Vector2.up * speed * Time.deltaTime);
-        */
-        // Tulis kode di sini
+        // Menggerakkan objek ke arah atas lokal objek
+        transform.Translate(Vector2.up * speed * Time.deltaTime);
     }
-    
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        /*
-            CLUE:
-            Ganti "false" dengan kondisi pengecekan tag musuh:
-            collision.CompareTag("Enemy")
-        */
-        if (false)
+        // Kena tembok kelas: peluru hilang
+        if (collision.GetComponent<ClassroomWall>() != null)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        // Cek apakah objek yang ditabrak memiliki Tag "Enemy"
+        if (collision.CompareTag("Enemy"))
         {
             Health health = collision.GetComponent<Health>();
 
@@ -43,8 +41,8 @@ public class Projectile : MonoBehaviour
                 health.TakeDamage(damage);
             }
 
+            // Hancurkan projectile/peluru setelah mengenai musuh
             Destroy(gameObject);
         }
     }
-
 }

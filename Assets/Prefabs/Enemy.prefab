@@ -1700,6 +1700,7 @@ GameObject:
   - component: {fileID: 3455275962190095749}
   - component: {fileID: 8563519593245990536}
   - component: {fileID: 7322718432409334246}
+  - component: {fileID: 3116635445924079201}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Enemy
@@ -1822,3 +1823,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Health
   maxHealth: 3
+--- !u!114 &3116635445924079201
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8613787512034395671}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76fafeb404984c245b24f692785c1479, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HopVisual
+  hopSpeed: 12
+  hopHeight: 0.1
+  squashAmount: 0.15
+  tiltAngle: 8
+  maxSpeed: 5
+  smooth: 12

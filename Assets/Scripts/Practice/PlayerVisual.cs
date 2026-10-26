@@ -24,7 +24,7 @@ public class PlayerVisual : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        visual = transform.GetChild(0); // child pertama = Sprite
+        visual = transform.Find("Sprite"); // child pertama = Sprite
     }
 
     private void Start()

@@ -4,12 +4,17 @@ using UnityEngine;
 public class Spawner : MonoBehaviour
 {
     [Header("Spawn Settings")]
-    [SerializeField] private GameObject prefab;
+    [SerializeField] private GameObject[] enemies;
     [SerializeField] private Transform target;
     [SerializeField] private float spawnRadius = 5f;
     [SerializeField] private float spawnInterval = 2f;
     [SerializeField] private float minSpawnDistance = 3.5f; // never spawn right on top of the player
     [SerializeField] private int maxAlive = 12;             // 0 = no limit
+
+    [Header("Enemy Selection (Normal Distribution)")]
+    [field:SerializeField, Range(0f, 1f)] public float EnemyBias { get; private set; } = 0f;
+    [SerializeField, Range(0f, 1f)] private float stdDev = 0.15f;
+    [SerializeField] private bool limitToOneStdDev = false;
 
     [Header("Keep Spawns Inside The Room")]
     [SerializeField] private bool limitToRoom = true;
@@ -22,7 +27,7 @@ public class Spawner : MonoBehaviour
 
     private void Update()
     {
-        if (prefab == null || target == null)
+        if (enemies == null || enemies.Length == 0 || target == null)
         {
             return;
         }
@@ -50,15 +55,51 @@ public class Spawner : MonoBehaviour
             return;
         }
 
-        GameObject spawned = Instantiate(prefab, position, Quaternion.identity);
+        GameObject spawned = Instantiate(enemies[PickEnemyIndex()], position, Quaternion.identity);
         alive.Add(spawned);
+    }
+
+    private int PickEnemyIndex()
+    {
+        int lastIndex = enemies.Length - 1;
+        if (lastIndex == 0)
+        {
+            return 0;
+        }
+
+        float mean = EnemyBias * lastIndex;
+        float sigma = stdDev * lastIndex;
+
+        float value = mean;
+        for (int i = 0; i < 10; i++)
+        {
+            float candidate = mean + RandomGaussian() * sigma;
+
+            bool inArray = candidate > -0.5f && candidate < lastIndex + 0.5f;
+            bool inStdDev = !limitToOneStdDev || Mathf.Abs(candidate - mean) <= sigma;
+
+            if (inArray && inStdDev)
+            {
+                value = candidate;
+                break;
+            }
+        }
+
+        return Mathf.Clamp(Mathf.RoundToInt(value), 0, lastIndex);
+    }
+
+
+    private static float RandomGaussian()
+    {
+        float u1 = 1f - Random.value;
+        float u2 = Random.value;
+        return Mathf.Sqrt(-2f * Mathf.Log(u1)) * Mathf.Cos(2f * Mathf.PI * u2);
     }
 
     private bool TryGetSpawnPosition(out Vector3 position)
     {
         float maxRadius = Mathf.Max(spawnRadius, minSpawnDistance + 0.5f);
 
-        // 1) a point on a ring around the player
         for (int i = 0; i < 12; i++)
         {
             float angle = Random.Range(0f, Mathf.PI * 2f);
@@ -77,7 +118,6 @@ public class Spawner : MonoBehaviour
             }
         }
 
-        // 2) the player is near a wall: pick any point in the room that is far enough from the player
         if (limitToRoom)
         {
             for (int i = 0; i < 12; i++)

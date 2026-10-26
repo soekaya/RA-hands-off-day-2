@@ -16324,10 +16324,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de586bb6ab4507f4686cad7946d26564, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Spawner
-  prefab: {fileID: 8613787512034395671, guid: eaa73f328a6366941977c00e66790207, type: 3}
+  enemies:
+  - {fileID: 8613787512034395671, guid: eaa73f328a6366941977c00e66790207, type: 3}
+  - {fileID: 8613787512034395671, guid: f15581bf06290d644b7768017dc7e633, type: 3}
+  - {fileID: 8613787512034395671, guid: 83ec8b2680a871540bc7a962218ef8b5, type: 3}
   target: {fileID: 1622456731}
   spawnRadius: 5
   spawnInterval: 2
+  minSpawnDistance: 3.5
+  maxAlive: 12
+  <EnemyBias>k__BackingField: 1
+  stdDev: 0.15
+  limitToOneStdDev: 0
   limitToRoom: 1
   roomCenter: {x: 0, y: 0}
   roomSize: {x: 24, y: 12}
@@ -18401,6 +18409,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Health
   maxHealth: 3
+  playerInvincibleTime: 0.8
+  dropPrefab: {fileID: 0}
+  dropChance: 0.5
 --- !u!1 &1641083944
 GameObject:
   m_ObjectHideFlags: 0

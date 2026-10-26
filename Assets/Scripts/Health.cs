@@ -1,35 +1,206 @@
-
+using UnityEditor.Rendering.LookDev;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Health : MonoBehaviour
 {
     public int maxHealth = 3;
-    private int currentHealth;
 
-    private void Start()
+    [Header("Player Only")]
+    public float playerInvincibleTime = 0.8f;
+
+    [Header("Enemy Drop (optional)")]
+    public GameObject dropPrefab;
+    [Range(0f, 1f)] public float dropChance = 0.5f;
+
+    // damage, hit direction, knockback force
+    public event System.Action<int, Vector2, float> onDamaged;
+    public event System.Action onDied;
+
+    public int CurrentHealth { get { return currentHealth; } }
+    public int MaxHealth { get { return maxHealth; } }
+    public bool IsDead { get { return isDead; } }
+
+    private int currentHealth;
+    private bool isDead;
+    private bool isPlayer;
+    private bool canRestart;
+    private float invincibleUntil;
+    private HitFeedback feedback;
+
+    private static readonly Color PlayerHitColor = new Color(1f, 0.12f, 0.12f, 1f);
+    private static readonly Color PlayerLightColor = new Color(1f, 0.55f, 0.55f, 1f);
+    private static readonly Color PopupColor = new Color(1f, 0.92f, 0.45f, 1f);
+
+    private void Awake()
     {
         currentHealth = maxHealth;
-    }
+        isPlayer = CompareTag("Player");
 
-    public void TakeDamage(int damage)
-    {
-        currentHealth -= damage;
+        EnsureFeedback();
 
-        Debug.Log(gameObject.name + " HP: " + currentHealth);
-
-        if (currentHealth <= 0)
+        if (GetComponent<HealthBar>() == null)
         {
-            Die();
+            gameObject.AddComponent<HealthBar>();
         }
     }
 
-    private void Die()
+    private void Update()
     {
-        if (CompareTag("Enemy"))
+        if (isDead && isPlayer && canRestart && Input.GetKeyDown(KeyCode.R))
+        {
+            Time.timeScale = 1f;
+            SceneManager.LoadScene(gameObject.scene.name);
+        }
+    }
+
+    private void EnsureFeedback()
+    {
+        if (feedback != null) return;
+
+        feedback = GetComponent<HitFeedback>();
+        if (feedback == null)
+        {
+            feedback = gameObject.AddComponent<HitFeedback>();
+        }
+    }
+
+    // Old signature, still works for any script that calls TakeDamage(1)
+    public void TakeDamage(int damage)
+    {
+        TakeDamage(damage, Vector2.zero, 0f);
+    }
+
+    public void TakeDamage(int damage, Vector2 hitDirection, float knockback = 0f)
+    {
+        if (isDead || damage <= 0) return;
+        if (isPlayer && Time.time < invincibleUntil) return;
+
+        EnsureFeedback();
+
+        currentHealth = Mathf.Max(0, currentHealth - damage);
+        Vector2 dir = hitDirection.sqrMagnitude > 0.0001f ? hitDirection.normalized : Vector2.zero;
+
+        Vector3 headPos = transform.position + Vector3.up * (feedback.TopOffset + 0.2f);
+        Vector3 bodyPos = transform.position + Vector3.up * (feedback.TopOffset * 0.5f);
+
+        // let the movement scripts react first (knockback, interrupt an attack...)
+        if (onDamaged != null)
+        {
+            onDamaged(damage, dir, knockback);
+        }
+
+        if (isPlayer)
+        {
+            invincibleUntil = Time.time + playerInvincibleTime;
+
+            feedback.Flash(PlayerHitColor, 0.2f);
+            feedback.Shake(0.22f, 0.3f);
+            feedback.Blink(playerInvincibleTime);
+
+            GameFX.Burst(bodyPos, new Color[] { PlayerHitColor, PlayerLightColor }, 10, 5f, 0.18f, 0.45f, dir);
+            GameFX.Popup(headPos, "-" + damage, PlayerHitColor, 5f);
+
+            CameraShake.Shake(0.3f, 0.3f);
+            CameraShake.HitStop(0.07f);
+        }
+        else
+        {
+            feedback.Flash(Color.white, 0.1f);
+            feedback.Shake(0.12f, 0.15f);
+
+            GameFX.Burst(bodyPos, feedback.OriginalColors, 6, 4.5f, 0.15f, 0.35f, dir);
+            GameFX.Popup(headPos, damage.ToString(), PopupColor, 4f);
+
+            CameraShake.Shake(0.07f, 0.1f);
+        }
+
+        if (currentHealth <= 0)
+        {
+            Die(dir);
+        }
+    }
+
+    private void Die(Vector2 hitDirection)
+    {
+        if (isDead) return;
+        isDead = true;
+
+        if (onDied != null)
+        {
+            onDied();
+        }
+
+        if (isPlayer)
+        {
+            PlayerDie();
+            return;
+        }
+
+        if (CompareTag("Enemy") && LevelManager.instance != null)
         {
             LevelManager.instance.AddKill();
         }
 
-        Destroy(gameObject);
+        Vector3 bodyPos = transform.position + Vector3.up * (feedback.TopOffset * 0.5f);
+        GameFX.Burst(bodyPos, feedback.OriginalColors, 16, 7f, 0.22f, 0.6f, hitDirection);
+        CameraShake.Shake(0.15f, 0.18f);
+        CameraShake.HitStop(0.05f);
+
+        if (dropPrefab != null && Random.value <= dropChance)
+        {
+            Instantiate(dropPrefab, transform.position, Quaternion.identity);
+        }
+
+        // stop everything, show the white flash for a moment, then remove
+        EnemyMovement ai = GetComponent<EnemyMovement>();
+        if (ai != null) ai.enabled = false;
+
+        Rigidbody2D rb = GetComponent<Rigidbody2D>();
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector2.zero;
+            rb.simulated = false;
+        }
+
+        Collider2D[] colliders = GetComponents<Collider2D>();
+        for (int i = 0; i < colliders.Length; i++)
+        {
+            colliders[i].enabled = false;
+        }
+
+        feedback.Flash(Color.white, 0.2f);
+        Destroy(gameObject, 0.08f);
+    }
+
+    private void PlayerDie()
+    {
+        PlayerMovement move = GetComponent<PlayerMovement>();
+        if (move != null) move.enabled = false;
+
+        Gun[] guns = GetComponentsInChildren<Gun>();
+        for (int i = 0; i < guns.Length; i++)
+        {
+            guns[i].enabled = false;
+        }
+
+        Rigidbody2D rb = GetComponent<Rigidbody2D>();
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector2.zero;
+            rb.simulated = false;
+        }
+
+        Vector3 bodyPos = transform.position + Vector3.up * (feedback.TopOffset * 0.5f);
+        GameFX.Burst(bodyPos, feedback.OriginalColors, 28, 8f, 0.25f, 0.9f, Vector2.zero);
+        GameFX.Burst(bodyPos, new Color[] { PlayerHitColor, PlayerLightColor }, 14, 6f, 0.2f, 0.7f, Vector2.zero);
+        CameraShake.Shake(0.5f, 0.5f);
+
+        feedback.Hide();
+
+        // R only works when this scene is in the Build Profiles scene list
+        canRestart = Application.CanStreamedLevelBeLoaded(gameObject.scene.name);
+        string hint = canRestart ? "Press R to restart" : "Stop and press Play to try again";
+        GameFX.CenterText("YOU DIED", hint);
     }
 }

@@ -2390,68 +2390,6 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
---- !u!1001 &188099075
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 1622456731}
-    m_Modifications:
-    - target: {fileID: 2297563420042122122, guid: c34da6f5b8854bc47a618ae4f9df88bc, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -0.34
-      objectReference: {fileID: 0}
-    - target: {fileID: 2297563420042122122, guid: c34da6f5b8854bc47a618ae4f9df88bc, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -0.01
-      objectReference: {fileID: 0}
-    - target: {fileID: 2297563420042122122, guid: c34da6f5b8854bc47a618ae4f9df88bc, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2297563420042122122, guid: c34da6f5b8854bc47a618ae4f9df88bc, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2297563420042122122, guid: c34da6f5b8854bc47a618ae4f9df88bc, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2297563420042122122, guid: c34da6f5b8854bc47a618ae4f9df88bc, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2297563420042122122, guid: c34da6f5b8854bc47a618ae4f9df88bc, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2297563420042122122, guid: c34da6f5b8854bc47a618ae4f9df88bc, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2297563420042122122, guid: c34da6f5b8854bc47a618ae4f9df88bc, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2297563420042122122, guid: c34da6f5b8854bc47a618ae4f9df88bc, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5977857456764655884, guid: c34da6f5b8854bc47a618ae4f9df88bc, type: 3}
-      propertyPath: m_Name
-      value: Gun (1)
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: c34da6f5b8854bc47a618ae4f9df88bc, type: 3}
---- !u!4 &188099076 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 2297563420042122122, guid: c34da6f5b8854bc47a618ae4f9df88bc, type: 3}
-  m_PrefabInstance: {fileID: 188099075}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &194489653
 GameObject:
   m_ObjectHideFlags: 0
@@ -10172,9 +10110,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6419394237482475947, guid: 4e6a44a62e4932440b70babe578550df, type: 3}
       insertIndex: 0
       addedObject: {fileID: 1880475650}
-    - targetCorrespondingSourceObject: {fileID: 6419394237482475947, guid: 4e6a44a62e4932440b70babe578550df, type: 3}
-      insertIndex: 1
-      addedObject: {fileID: 188099076}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 1103631598301865765, guid: 4e6a44a62e4932440b70babe578550df, type: 3}
       insertIndex: -1
@@ -10188,6 +10123,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1103631598301865765, guid: 4e6a44a62e4932440b70babe578550df, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1622456730}
+    - targetCorrespondingSourceObject: {fileID: 1103631598301865765, guid: 4e6a44a62e4932440b70babe578550df, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1622456732}
   m_SourcePrefab: {fileID: 100100000, guid: 4e6a44a62e4932440b70babe578550df, type: 3}
 --- !u!1 &915770350
 GameObject:
@@ -16390,6 +16328,10 @@ MonoBehaviour:
   target: {fileID: 1622456731}
   spawnRadius: 5
   spawnInterval: 2
+  limitToRoom: 1
+  roomCenter: {x: 0, y: 0}
+  roomSize: {x: 24, y: 12}
+  wallMargin: 1.2
 --- !u!4 &1446338757
 Transform:
   m_ObjectHideFlags: 0
@@ -18446,6 +18388,19 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6419394237482475947, guid: 4e6a44a62e4932440b70babe578550df, type: 3}
   m_PrefabInstance: {fileID: 915437108}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1622456732
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1622456725}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a9945bc5287e50348843a02907ddcec5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Health
+  maxHealth: 3
 --- !u!1 &1641083944
 GameObject:
   m_ObjectHideFlags: 0
@@ -21302,20 +21257,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b5441b44e939ac4f8deb6a37a013bca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ClassroomGenerator
-  floorWidth: 24
-  floorHeight: 12
-  topWallHeight: 2.5
-  wallThickness: 1
-  randomizeClutter: 1
-  seed: 18030312
-  paperCount: 14
-  pencilCount: 6
-  crumpledCount: 5
-  autoGenerateIfMissing: 1
-  fitCamera: 1
-  movePlayerToStart: 1
-  showChalkboardStats: 1
-  regenerateKey: 283
 --- !u!4 &1914836986
 Transform:
   m_ObjectHideFlags: 0

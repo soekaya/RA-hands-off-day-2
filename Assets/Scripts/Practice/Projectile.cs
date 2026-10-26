@@ -5,6 +5,9 @@ public class Projectile : MonoBehaviour
     public float speed = 10f;
     public float lifeTime = 3f;
     public int damage = 1;
+    public float knockback = 4f;
+
+    private static readonly Color SparkColor = new Color(1f, 0.80f, 0.30f, 1f);
 
     private void Start()
     {
@@ -24,9 +27,10 @@ public class Projectile : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        // Kena tembok kelas: peluru hilang
+        // Kena tembok kelas: peluru hilang dengan percikan kecil
         if (collision.GetComponent<ClassroomWall>() != null)
         {
+            GameFX.Burst(transform.position, SparkColor, 5, 4f, 0.12f, 0.25f, -(Vector2)transform.up);
             Destroy(gameObject);
             return;
         }
@@ -38,7 +42,8 @@ public class Projectile : MonoBehaviour
 
             if (health != null)
             {
-                health.TakeDamage(damage);
+                // arah peluru dipakai untuk knockback dan efek percikan
+                health.TakeDamage(damage, transform.up, knockback);
             }
 
             // Hancurkan projectile/peluru setelah mengenai musuh

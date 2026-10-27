@@ -1844,7 +1844,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Health
   maxHealth: 3
   playerInvincibleTime: 0.8
-  dropPrefab: {fileID: 0}
+  damageMultiplier: 1
+  dropPrefab: {fileID: 2763300499431770088, guid: e08fe358dae6cb44386ea67e24e1eb41, type: 3}
   dropChance: 0.5
 --- !u!114 &3116635445924079201
 MonoBehaviour:

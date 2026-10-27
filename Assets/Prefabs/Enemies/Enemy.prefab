@@ -1810,6 +1810,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyMovement
   moveSpeed: 3
+  stopDistance: 0.9
+  acceleration: 30
+  separationRadius: 1.1
+  separationForce: 2
+  contactDamage: 1
+  contactCooldown: 1
+  contactKnockback: 6
+  canDash: 1
+  dashMinRange: 2
+  dashMaxRange: 5.5
+  dashCooldown: 3.5
+  windupTime: 0.8
+  lockTime: 0.2
+  dashSpeed: 16
+  dashDistance: 4.5
+  dashDamage: 1
+  dashKnockback: 12
+  recoverTime: 0.8
+  wallStunBonus: 0.8
+  laneWidth: 1
 --- !u!114 &7322718432409334246
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1823,6 +1843,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Health
   maxHealth: 3
+  playerInvincibleTime: 0.8
+  damageMultiplier: 1
+  dropPrefab: {fileID: 2763300499431770088, guid: e08fe358dae6cb44386ea67e24e1eb41, type: 3}
+  dropChance: 0.5
 --- !u!114 &3116635445924079201
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1841,3 +1865,9 @@ MonoBehaviour:
   tiltAngle: 8
   maxSpeed: 5
   smooth: 12
+  autoFace: 1
+  faceDeadZone: 0.4
+  flipCooldown: 0.2
+  charge: 0
+  dashing: 0
+  dashDirection: {x: 1, y: 0}

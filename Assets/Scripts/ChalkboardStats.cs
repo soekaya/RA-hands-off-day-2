@@ -42,10 +42,10 @@ public class ChalkboardStats : MonoBehaviour
 
     private string BuildTitle(int wave, bool finished)
     {
-        if (WaveManager.Instance == null) return "FILKOM UB - SURVIVE THE CLASS";
-        if (finished) return "FILKOM UB - CLASS DISMISSED!";
-        if (wave <= 0) return "FILKOM UB - GET READY";
+        if (WaveManager.Instance == null) return "SURVIVE THE CLASS";
+        if (finished) return "CLASS DISMISSED!";
+        if (wave <= 0) return "GET READY";
 
-        return "FILKOM UB - WAVE " + wave + "/" + WaveManager.Instance.TotalWaves;
+        return "WAVE " + wave + "/" + WaveManager.Instance.TotalWaves;
     }
 }

@@ -1,9 +1,6 @@
 using System.Collections.Generic;
-using UnityEditor.Rendering.LookDev;
 using UnityEngine;
 
-// Chase -> Windup (shakes + shows the red-pen lane) -> Dash -> Recover (dazed, can't attack).
-// Shooting the enemy during Windup interrupts the dash. Crashing into a wall stuns it longer.
 public class EnemyMovement : MonoBehaviour
 {
     private enum State { Chase, Windup, Dash, Recover }

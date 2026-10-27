@@ -1,6 +1,5 @@
 using UnityEngine;
 
-// Procedural hop / squash / tilt animation for the child called "Sprite".
 public class HopVisual : MonoBehaviour
 {
     public float hopSpeed = 12f;

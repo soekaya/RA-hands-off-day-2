@@ -1,8 +1,6 @@
 using TMPro;
 using UnityEngine;
 
-// Static helper: square particles, floating damage numbers and big center text.
-// Everything is made from 2D objects, no assets needed.
 public static class GameFX
 {
     private static Sprite pixel;

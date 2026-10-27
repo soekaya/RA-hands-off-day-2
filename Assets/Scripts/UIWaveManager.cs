@@ -2,6 +2,7 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 
+// Same as the original: only "Wave x / total" and null checks were added.
 public class UIWaveManager : MonoBehaviour
 {
     [SerializeField] private GameObject wavePanel;
@@ -10,29 +11,35 @@ public class UIWaveManager : MonoBehaviour
 
     public void OnWaveStarted(int waveNumber)
     {
-        if (waveText != null)
+        string text = "Wave " + waveNumber;
+        if (WaveManager.Instance != null)
         {
-            wavePanel.SetActive(true);
-            waveText.text = $"Wave {waveNumber}";
-            StopAllCoroutines();
-            StartCoroutine(HideWaveTextAfterDelay());
+            text += " / " + WaveManager.Instance.TotalWaves;
         }
+
+        Show(text);
     }
 
     public void OnWaveCompleted(int waveNumber)
     {
-        if (waveText != null)
-        {
-            wavePanel.SetActive(true);
-            waveText.text = $"Wave {waveNumber} Completed!";
-            StopAllCoroutines();
-            StartCoroutine(HideWaveTextAfterDelay());
-        }
+        Show("Wave " + waveNumber + " Completed!");
+    }
+
+    private void Show(string text)
+    {
+        if (waveText == null) return;
+
+        if (wavePanel != null) wavePanel.SetActive(true);
+        waveText.text = text;
+
+        StopAllCoroutines();
+        StartCoroutine(HideWaveTextAfterDelay());
     }
 
     private IEnumerator HideWaveTextAfterDelay()
     {
         yield return new WaitForSeconds(waveTextDuration);
-        wavePanel.SetActive(false);
+
+        if (wavePanel != null) wavePanel.SetActive(false);
     }
 }

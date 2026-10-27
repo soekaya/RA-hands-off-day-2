@@ -1,4 +1,3 @@
-using UnityEditor.Rendering.LookDev;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -8,6 +7,9 @@ public class Health : MonoBehaviour
 
     [Header("Player Only")]
     public float playerInvincibleTime = 0.8f;
+
+    [Header("Weak Point")]
+    public float damageMultiplier = 1f;   // the robot sets this to 2 while it is overheated
 
     [Header("Enemy Drop (optional)")]
     public GameObject dropPrefab;
@@ -31,6 +33,7 @@ public class Health : MonoBehaviour
     private static readonly Color PlayerHitColor = new Color(1f, 0.12f, 0.12f, 1f);
     private static readonly Color PlayerLightColor = new Color(1f, 0.55f, 0.55f, 1f);
     private static readonly Color PopupColor = new Color(1f, 0.92f, 0.45f, 1f);
+    private static readonly Color HealColor = new Color(0.35f, 0.90f, 0.45f, 1f);
 
     private void Awake()
     {
@@ -65,6 +68,22 @@ public class Health : MonoBehaviour
         }
     }
 
+    // Gives health back (never above max). Returns how much was really healed.
+    public int Heal(int amount)
+    {
+        if (isDead || amount <= 0) return 0;
+
+        int before = currentHealth;
+        currentHealth = Mathf.Min(maxHealth, currentHealth + amount);
+        int gained = currentHealth - before;
+        if (gained <= 0) return 0;
+
+        EnsureFeedback();
+        GameFX.Popup(transform.position + Vector3.up * (feedback.TopOffset + 0.2f), "+" + gained, HealColor, 5f);
+        feedback.Flash(new Color(0.65f, 1f, 0.75f, 1f), 0.15f);
+        return gained;
+    }
+
     // Old signature, still works for any script that calls TakeDamage(1)
     public void TakeDamage(int damage)
     {
@@ -77,6 +96,9 @@ public class Health : MonoBehaviour
         if (isPlayer && Time.time < invincibleUntil) return;
 
         EnsureFeedback();
+
+        // weak point: e.g. the robot takes double damage while overheated
+        damage = Mathf.Max(1, Mathf.RoundToInt(damage * damageMultiplier));
 
         currentHealth = Mathf.Max(0, currentHealth - damage);
         Vector2 dir = hitDirection.sqrMagnitude > 0.0001f ? hitDirection.normalized : Vector2.zero;
@@ -137,10 +159,18 @@ public class Health : MonoBehaviour
             return;
         }
 
-        if (CompareTag("Enemy") && LevelManager.instance != null)
+        if (CompareTag("Enemy"))
         {
-            LevelManager.instance.AddKill();
-            WaveManager.Instance.RegisterKill();
+            if (LevelManager.instance != null)
+            {
+                LevelManager.instance.AddKill();
+            }
+
+            // the wave system counts the kills
+            if (WaveManager.Instance != null)
+            {
+                WaveManager.Instance.RegisterKill();
+            }
         }
 
         Vector3 bodyPos = transform.position + Vector3.up * (feedback.TopOffset * 0.5f);
@@ -156,6 +186,9 @@ public class Health : MonoBehaviour
         // stop everything, show the white flash for a moment, then remove
         EnemyMovement ai = GetComponent<EnemyMovement>();
         if (ai != null) ai.enabled = false;
+
+        RobotEnemy robot = GetComponent<RobotEnemy>();
+        if (robot != null) robot.enabled = false;
 
         Rigidbody2D rb = GetComponent<Rigidbody2D>();
         if (rb != null)

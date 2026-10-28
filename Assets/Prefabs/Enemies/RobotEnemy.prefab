@@ -1400,7 +1400,9 @@ MonoBehaviour:
   playerInvincibleTime: 0.8
   damageMultiplier: 1
   dropPrefab: {fileID: 2763300499431770088, guid: e08fe358dae6cb44386ea67e24e1eb41, type: 3}
-  dropChance: 0.5
+  dropChance: 0.5003
+  healDropPrefab: {fileID: 9052235543491005841, guid: d7e9bdca5d0585b45a57a7719187464e, type: 3}
+  healDropChance: 0.15
 --- !u!114 &2443411883060089505
 MonoBehaviour:
   m_ObjectHideFlags: 0

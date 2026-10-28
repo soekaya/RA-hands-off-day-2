@@ -15,6 +15,10 @@ public class Health : MonoBehaviour
     public GameObject dropPrefab;
     [Range(0f, 1f)] public float dropChance = 0.5f;
 
+    [Header("Heal Drop (optional, e.g. the POROS butterfly)")]
+    public GameObject healDropPrefab;
+    [Range(0f, 1f)] public float healDropChance = 0.15f;
+
     // damage, hit direction, knockback force
     public event System.Action<int, Vector2, float> onDamaged;
     public event System.Action onDied;
@@ -22,6 +26,7 @@ public class Health : MonoBehaviour
     public int CurrentHealth { get { return currentHealth; } }
     public int MaxHealth { get { return maxHealth; } }
     public bool IsDead { get { return isDead; } }
+    public bool IsInvincible { get { return isPlayer && Time.time < invincibleUntil; } }
 
     private int currentHealth;
     private bool isDead;
@@ -68,7 +73,14 @@ public class Health : MonoBehaviour
         }
     }
 
-    // Gives health back (never above max). Returns how much was really healed.
+    // invisibility stelah dash
+    public void SetInvincible(float duration)
+    {
+        if (duration <= 0f) return;
+        invincibleUntil = Mathf.Max(invincibleUntil, Time.time + duration);
+    }
+
+   // heal
     public int Heal(int amount)
     {
         if (isDead || amount <= 0) return 0;
@@ -84,7 +96,7 @@ public class Health : MonoBehaviour
         return gained;
     }
 
-    // Old signature, still works for any script that calls TakeDamage(1)
+    // damage
     public void TakeDamage(int damage)
     {
         TakeDamage(damage, Vector2.zero, 0f);
@@ -93,7 +105,7 @@ public class Health : MonoBehaviour
     public void TakeDamage(int damage, Vector2 hitDirection, float knockback = 0f)
     {
         if (isDead || damage <= 0) return;
-        if (isPlayer && Time.time < invincibleUntil) return;
+        if (IsInvincible) return;
 
         EnsureFeedback();
 
@@ -114,7 +126,8 @@ public class Health : MonoBehaviour
 
         if (isPlayer)
         {
-            invincibleUntil = Time.time + playerInvincibleTime;
+            // a hit never shortens an invincibility that is already running
+            SetInvincible(playerInvincibleTime);
 
             feedback.Flash(PlayerHitColor, 0.2f);
             feedback.Shake(0.22f, 0.3f);
@@ -143,6 +156,7 @@ public class Health : MonoBehaviour
         }
     }
 
+    // modar
     private void Die(Vector2 hitDirection)
     {
         if (isDead) return;
@@ -183,6 +197,12 @@ public class Health : MonoBehaviour
             Instantiate(dropPrefab, transform.position, Quaternion.identity);
         }
 
+        // a second, separate drop: the heal item (each one has its own chance)
+        if (healDropPrefab != null && Random.value <= healDropChance)
+        {
+            Instantiate(healDropPrefab, transform.position, Quaternion.identity);
+        }
+
         // stop everything, show the white flash for a moment, then remove
         EnemyMovement ai = GetComponent<EnemyMovement>();
         if (ai != null) ai.enabled = false;
@@ -190,18 +210,7 @@ public class Health : MonoBehaviour
         RobotEnemy robot = GetComponent<RobotEnemy>();
         if (robot != null) robot.enabled = false;
 
-        Rigidbody2D rb = GetComponent<Rigidbody2D>();
-        if (rb != null)
-        {
-            rb.linearVelocity = Vector2.zero;
-            rb.simulated = false;
-        }
-
-        Collider2D[] colliders = GetComponents<Collider2D>();
-        for (int i = 0; i < colliders.Length; i++)
-        {
-            colliders[i].enabled = false;
-        }
+        FreezeBody();
 
         feedback.Flash(Color.white, 0.2f);
         Destroy(gameObject, 0.08f);
@@ -212,18 +221,17 @@ public class Health : MonoBehaviour
         PlayerMovement move = GetComponent<PlayerMovement>();
         if (move != null) move.enabled = false;
 
+        // the dash must stop too, otherwise it keeps pushing the dead player
+        PlayerDash dash = GetComponent<PlayerDash>();
+        if (dash != null) dash.enabled = false;
+
         Gun[] guns = GetComponentsInChildren<Gun>();
         for (int i = 0; i < guns.Length; i++)
         {
             guns[i].enabled = false;
         }
 
-        Rigidbody2D rb = GetComponent<Rigidbody2D>();
-        if (rb != null)
-        {
-            rb.linearVelocity = Vector2.zero;
-            rb.simulated = false;
-        }
+        FreezeBody();
 
         Vector3 bodyPos = transform.position + Vector3.up * (feedback.TopOffset * 0.5f);
         GameFX.Burst(bodyPos, feedback.OriginalColors, 28, 8f, 0.25f, 0.9f, Vector2.zero);
@@ -236,5 +244,24 @@ public class Health : MonoBehaviour
         canRestart = Application.CanStreamedLevelBeLoaded(gameObject.scene.name);
         string hint = canRestart ? "Press R to restart" : "Stop and press Play to try again";
         GameFX.CenterText("YOU DIED", hint);
+    }
+
+    // Stops the rigidbody and (for enemies) turns the colliders off.
+    private void FreezeBody()
+    {
+        Rigidbody2D rb = GetComponent<Rigidbody2D>();
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector2.zero;
+            rb.simulated = false;
+        }
+
+        if (isPlayer) return;
+
+        Collider2D[] colliders = GetComponents<Collider2D>();
+        for (int i = 0; i < colliders.Length; i++)
+        {
+            colliders[i].enabled = false;
+        }
     }
 }

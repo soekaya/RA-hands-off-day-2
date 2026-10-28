@@ -24,6 +24,7 @@ public class PlayerDash : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        health = GetComponent<Health>();
 
         Transform body = transform.Find("Sprite");
         if (body != null)
@@ -32,8 +33,16 @@ public class PlayerDash : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        // always start clean (e.g. after the scene reloads)
+        IsDashing = false;
+        nextDashTime = 0f;
+    }
+
     private void Update()
     {
+        // Health may be added by PlayerMovement after our Awake, so keep trying
         if (health == null)
         {
             health = GetComponent<Health>();
@@ -59,7 +68,6 @@ public class PlayerDash : MonoBehaviour
         else if (Time.time >= nextEffectTime)
         {
             nextEffectTime = Time.time + 0.04f;
-            SpawnGhost();
             SpawnSmoke();
         }
     }
@@ -122,29 +130,4 @@ public class PlayerDash : MonoBehaviour
         }
     }
 
-    // the "blur": a see-through copy of the body is left behind and fades away
-    private void SpawnGhost()
-    {
-        if (bodyParts == null) return;
-
-        for (int i = 0; i < bodyParts.Length; i++)
-        {
-            SpriteRenderer part = bodyParts[i];
-            if (part == null || !part.enabled) continue;
-
-            GameObject ghost = new GameObject("DashGhost");
-            ghost.transform.position = part.transform.position;
-            ghost.transform.rotation = part.transform.rotation;
-            ghost.transform.localScale = part.transform.lossyScale;
-
-            SpriteRenderer sr = ghost.AddComponent<SpriteRenderer>();
-            sr.sprite = part.sprite;
-            sr.flipX = part.flipX;
-            sr.flipY = part.flipY;
-            sr.color = new Color(0.55f, 0.85f, 1f, 0.55f);
-            sr.sortingOrder = part.sortingOrder - 1;
-
-            ghost.AddComponent<FXParticle>().Init(Vector2.zero, 0.3f, 0f);
-        }
-    }
 }

@@ -6,6 +6,7 @@ public class PlayerMovement : MonoBehaviour
 
     private Rigidbody2D rb;
     private Health health;
+    private PlayerDash dash;
     private float horizontal;
     private float vertical;
 
@@ -16,6 +17,7 @@ public class PlayerMovement : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        dash = GetComponent<PlayerDash>();
 
         // the player needs a Health component to take damage; add one if you forgot
         health = GetComponent<Health>();
@@ -49,6 +51,12 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
+        // while dashing, PlayerDash controls the velocity.
+        if (dash != null && dash.IsDashing)
+        {
+            return;
+        }
+
         // while knocked back, the push fades out and input is ignored for a moment
         if (knockTimer > 0f)
         {

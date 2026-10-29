@@ -7,7 +7,15 @@ public class Gun : MonoBehaviour
     public Transform firePoint;
     public float fireRate = 0.2f;
 
+    public AudioClip shootSound;
+    [Range(0f, 1f)] public float shootVolume = 0.7f;
     private float nextFireTime;
+    private AudioSource audioSource;
+
+    private void Awake()
+    {
+        audioSource = GetComponent<AudioSource>();
+    }
 
     private void Update()
     {
@@ -45,6 +53,11 @@ public class Gun : MonoBehaviour
 
             Instantiate(projectilePrefab, firePoint.position, Quaternion.Euler(0f, 0f, angle - 90f));
             GetComponent<GunVisual>().Kick();
+
+            if (shootSound != null)
+            {
+                audioSource.PlayOneShot(shootSound, shootVolume);
+            }
 
             nextFireTime = Time.time + fireRate;
         }

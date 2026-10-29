@@ -1890,6 +1890,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PorosButterfly
   healAmount: 1
+  healSFX: {fileID: 8300000, guid: 3877135ca10e1a541a0cf5715a267fc2, type: 3}
+  healVolume: 1
   catchRadius: 0.9
   lifeTime: 25
   wanderSpeed: 1.2

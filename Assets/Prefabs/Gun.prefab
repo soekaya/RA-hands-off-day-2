@@ -483,7 +483,7 @@ MonoBehaviour:
   firePoint: {fileID: 34470041198579103}
   fireRate: 0.2
   shootSound: {fileID: 8300000, guid: ddfc62b35898bc04892c11c7bc837e02, type: 3}
-  shootVolume: 0.01
+  shootVolume: 0.068
 --- !u!61 &6120933548092979450
 BoxCollider2D:
   m_ObjectHideFlags: 0

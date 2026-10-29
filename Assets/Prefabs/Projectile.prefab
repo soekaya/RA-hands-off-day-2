@@ -357,6 +357,9 @@ MonoBehaviour:
   speed: 10
   lifeTime: 3
   damage: 1
+  knockback: 4
+  hitSound: {fileID: 8300000, guid: fa0035e75dea5a244a6c97ec3ae61077, type: 3}
+  hitVolume: 1
 --- !u!70 &7797196839169072480
 CapsuleCollider2D:
   m_ObjectHideFlags: 0

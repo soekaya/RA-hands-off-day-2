@@ -10,6 +10,9 @@ public class PorosButterfly : MonoBehaviour
 {
     [Header("Heal")]
     public int healAmount = 1;
+
+    public AudioClip healSFX;
+    public float healVolume = 1f;
     public float catchRadius = 0.9f;
     public float lifeTime = 25f;
 
@@ -228,6 +231,23 @@ public class PorosButterfly : MonoBehaviour
 
         finished = true;
         playerHealth.Heal(healAmount);   // Health shows the green "+1" and the flash
+
+        if (healSFX != null)
+        {
+            AudioSource playerAudio = player.GetComponent<AudioSource>();
+
+            if (playerAudio != null)
+            {
+                playerAudio.PlayOneShot(healSFX, healVolume);
+            }
+            else
+            {
+                playerAudio = player.gameObject.AddComponent<AudioSource>();
+                playerAudio.spatialBlend = 0f; 
+                playerAudio.PlayOneShot(healSFX, healVolume);
+            }
+        }
+
 
         GameFX.Burst(transform.position, SparkleColors, 14, 5f, 0.16f, 0.6f, Vector2.zero);
         Destroy(gameObject);

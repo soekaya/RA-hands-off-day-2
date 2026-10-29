@@ -1844,13 +1844,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Health
   maxHealth: 3
   playerInvincibleTime: 0.8
+  deathAudioSource: {fileID: 0}
+  deathSFX: {fileID: 8300000, guid: fa0035e75dea5a244a6c97ec3ae61077, type: 3}
+  hitAudioSource: {fileID: 0}
+  hitSFX: {fileID: 0}
   damageMultiplier: 1
   dropPrefab: {fileID: 2763300499431770088, guid: e08fe358dae6cb44386ea67e24e1eb41, type: 3}
   dropChance: 0.5
   healDropPrefab: {fileID: 9052235543491005841, guid: d7e9bdca5d0585b45a57a7719187464e, type: 3}
   healDropChance: 0.15
-  hitSound: {fileID: 8300000, guid: fa0035e75dea5a244a6c97ec3ae61077, type: 3}
-  volume: 0.1
 --- !u!114 &3116635445924079201
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -7,6 +7,12 @@ public class Health : MonoBehaviour
 
     [Header("Player Only")]
     public float playerInvincibleTime = 0.8f;
+    public AudioSource deathAudioSource; 
+    public AudioClip deathSFX;
+    public AudioSource hitAudioSource;
+    public AudioClip hitSFX;
+    public AudioClip dropSFX;
+    public AudioClip healDropSFX;
 
     [Header("Weak Point")]
     public float damageMultiplier = 1f;   // the robot sets this to 2 while it is overheated
@@ -126,6 +132,10 @@ public class Health : MonoBehaviour
 
         if (isPlayer)
         {
+            if (hitAudioSource != null && hitSFX != null)
+            {
+                hitAudioSource.PlayOneShot(hitSFX);
+            }
             // a hit never shortens an invincibility that is already running
             SetInvincible(playerInvincibleTime);
 
@@ -141,6 +151,19 @@ public class Health : MonoBehaviour
         }
         else
         {
+            if (hitSFX != null)
+            {
+                GameObject tempAudio = new GameObject("TempHitAudio");
+                tempAudio.transform.position = transform.position;
+                AudioSource aSource = tempAudio.AddComponent<AudioSource>();
+
+                aSource.clip = hitSFX;
+                aSource.spatialBlend = 0f; // FORCE KE 2D (Suara dijamin terdengar keras)
+                aSource.Play();
+
+                Destroy(tempAudio, hitSFX.length);
+            }
+
             feedback.Flash(Color.white, 0.1f);
             feedback.Shake(0.12f, 0.15f);
 
@@ -175,9 +198,22 @@ public class Health : MonoBehaviour
 
         if (CompareTag("Enemy"))
         {
+            if (deathSFX != null)
+            {
+                GameObject tempAudio = new GameObject("TempDeathAudio");
+                tempAudio.transform.position = transform.position;
+                AudioSource aSource = tempAudio.AddComponent<AudioSource>();
+
+                aSource.clip = deathSFX;
+                aSource.spatialBlend = 0f; // FORCE KE 2D (Suara dijamin terdengar keras)
+                aSource.Play();
+
+                Destroy(tempAudio, deathSFX.length);
+            }
+
             if (LevelManager.instance != null)
             {
-                LevelManager.instance.AddKill();
+                LevelManager.instance.AddKill();    
             }
 
             // the wave system counts the kills
@@ -232,6 +268,11 @@ public class Health : MonoBehaviour
         }
 
         FreezeBody();
+
+        if (deathAudioSource != null && deathSFX != null)
+        {
+            deathAudioSource.PlayOneShot(deathSFX);
+        }
 
         Vector3 bodyPos = transform.position + Vector3.up * (feedback.TopOffset * 0.5f);
         GameFX.Burst(bodyPos, feedback.OriginalColors, 28, 8f, 0.25f, 0.9f, Vector2.zero);

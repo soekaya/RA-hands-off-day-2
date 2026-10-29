@@ -1,9 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// Classroom-themed dash warning: a red highlighter lane that fills up, a dashed red-pen line,
-// a red "X" (like a wrong answer on an exam) where the dash ends, and a "!" above the enemy.
-// Created automatically by EnemyMovement.
 public class AttackTelegraph : MonoBehaviour
 {
     private static readonly Color PenRed = new Color(0.90f, 0.12f, 0.18f, 1f);

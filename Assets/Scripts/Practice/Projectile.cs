@@ -2,10 +2,9 @@
 
     public class Projectile : MonoBehaviour
     {
-        public float speed = 10f;
-        public float lifeTime = 3f;
-        public int damage = 1;
-        public float knockback = 4f;
+        damage += UpgradeManager.BonusDamage;
+        Destroy(gameObject, lifeTime);
+    }
 
     public AudioClip hitSound;
     [Range(0f, 1f)] public float hitVolume = 0.8f;

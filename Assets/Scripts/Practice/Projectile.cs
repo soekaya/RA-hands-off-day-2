@@ -11,6 +11,7 @@ public class Projectile : MonoBehaviour
 
     private void Start()
     {
+        damage += UpgradeManager.BonusDamage;
         Destroy(gameObject, lifeTime);
     }
 

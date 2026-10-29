@@ -14,6 +14,7 @@ public class WaveManager : MonoBehaviour
     [SerializeField] private int healPerWave = 1;
     [SerializeField] private float initialDelay = 2f;
     [SerializeField] private float timeBetweenWaves = 5f;
+    [SerializeField] private float upgradeDelay = 2f;
 
     [SerializeField] private UnityEvent<int> waveStarted;
     [SerializeField] private UnityEvent<int> waveCompleted;
@@ -66,6 +67,7 @@ public class WaveManager : MonoBehaviour
 
             float bias = Mathf.Clamp01(CurrentWave / (float)maxWaveEvolution);
 
+            Debug.Log($"Wave {CurrentWave} starting! Target: {TargetEnemyCount}");
             waveStarted?.Invoke(CurrentWave);
             SetSpawners(true, bias);
 
@@ -78,6 +80,7 @@ public class WaveManager : MonoBehaviour
             // the player died: stop the waves
             if (PlayerIsDead()) yield break;
 
+            Debug.Log($"Wave {CurrentWave} completed! {EnemyKilledCount} enemies killed.");
             waveCompleted?.Invoke(CurrentWave);
 
             if (playerHealth != null)
@@ -87,6 +90,16 @@ public class WaveManager : MonoBehaviour
 
             if (CurrentWave < totalWaves)
             {
+                // the upgrade cards (the next wave waits until you chose or skipped)
+                if (UpgradeManager.Instance != null)
+                {
+                    yield return new WaitForSeconds(upgradeDelay);
+                    UpgradeManager.Instance.Open();
+                    yield return new WaitUntil(() => !UpgradeManager.Instance.IsOpen || PlayerIsDead());
+                }
+
+                if (PlayerIsDead()) yield break;
+
                 yield return new WaitForSeconds(timeBetweenWaves);
             }
         }

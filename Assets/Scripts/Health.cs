@@ -26,7 +26,6 @@ public class Health : MonoBehaviour
     public int CurrentHealth { get { return currentHealth; } }
     public int MaxHealth { get { return maxHealth; } }
     public bool IsDead { get { return isDead; } }
-    public bool IsInvincible { get { return isPlayer && Time.time < invincibleUntil; } }
 
     private int currentHealth;
     private bool isDead;
@@ -73,14 +72,7 @@ public class Health : MonoBehaviour
         }
     }
 
-    // invisibility stelah dash
-    public void SetInvincible(float duration)
-    {
-        if (duration <= 0f) return;
-        invincibleUntil = Mathf.Max(invincibleUntil, Time.time + duration);
-    }
-
-   // heal
+    // Gives health back (never above max). Returns how much was really healed.
     public int Heal(int amount)
     {
         if (isDead || amount <= 0) return 0;
@@ -96,7 +88,25 @@ public class Health : MonoBehaviour
         return gained;
     }
 
-    // damage
+    // Raises max HP and gives that HP right away (used by the Heart Container card)
+    public void AddMaxHealth(int amount)
+    {
+        if (isDead || amount <= 0) return;
+
+        maxHealth += amount;
+        currentHealth += amount;
+
+        EnsureFeedback();
+        GameFX.Popup(transform.position + Vector3.up * (feedback.TopOffset + 0.2f), "+" + amount + " MAX HP", HealColor, 4f);
+    }
+
+    // The player cannot be hurt for this many seconds (used by the dash)
+    public void SetInvincible(float seconds)
+    {
+        invincibleUntil = Mathf.Max(invincibleUntil, Time.time + seconds);
+    }
+
+    // Old signature, still works for any script that calls TakeDamage(1)
     public void TakeDamage(int damage)
     {
         TakeDamage(damage, Vector2.zero, 0f);
@@ -105,7 +115,7 @@ public class Health : MonoBehaviour
     public void TakeDamage(int damage, Vector2 hitDirection, float knockback = 0f)
     {
         if (isDead || damage <= 0) return;
-        if (IsInvincible) return;
+        if (isPlayer && Time.time < invincibleUntil) return;
 
         EnsureFeedback();
 
@@ -126,8 +136,7 @@ public class Health : MonoBehaviour
 
         if (isPlayer)
         {
-            // a hit never shortens an invincibility that is already running
-            SetInvincible(playerInvincibleTime);
+            invincibleUntil = Time.time + playerInvincibleTime;
 
             feedback.Flash(PlayerHitColor, 0.2f);
             feedback.Shake(0.22f, 0.3f);
@@ -156,7 +165,6 @@ public class Health : MonoBehaviour
         }
     }
 
-    // modar
     private void Die(Vector2 hitDirection)
     {
         if (isDead) return;
@@ -210,7 +218,18 @@ public class Health : MonoBehaviour
         RobotEnemy robot = GetComponent<RobotEnemy>();
         if (robot != null) robot.enabled = false;
 
-        FreezeBody();
+        Rigidbody2D rb = GetComponent<Rigidbody2D>();
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector2.zero;
+            rb.simulated = false;
+        }
+
+        Collider2D[] colliders = GetComponents<Collider2D>();
+        for (int i = 0; i < colliders.Length; i++)
+        {
+            colliders[i].enabled = false;
+        }
 
         feedback.Flash(Color.white, 0.2f);
         Destroy(gameObject, 0.08f);
@@ -221,17 +240,18 @@ public class Health : MonoBehaviour
         PlayerMovement move = GetComponent<PlayerMovement>();
         if (move != null) move.enabled = false;
 
-        // the dash must stop too, otherwise it keeps pushing the dead player
-        PlayerDash dash = GetComponent<PlayerDash>();
-        if (dash != null) dash.enabled = false;
-
         Gun[] guns = GetComponentsInChildren<Gun>();
         for (int i = 0; i < guns.Length; i++)
         {
             guns[i].enabled = false;
         }
 
-        FreezeBody();
+        Rigidbody2D rb = GetComponent<Rigidbody2D>();
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector2.zero;
+            rb.simulated = false;
+        }
 
         Vector3 bodyPos = transform.position + Vector3.up * (feedback.TopOffset * 0.5f);
         GameFX.Burst(bodyPos, feedback.OriginalColors, 28, 8f, 0.25f, 0.9f, Vector2.zero);
@@ -244,24 +264,5 @@ public class Health : MonoBehaviour
         canRestart = Application.CanStreamedLevelBeLoaded(gameObject.scene.name);
         string hint = canRestart ? "Press R to restart" : "Stop and press Play to try again";
         GameFX.CenterText("YOU DIED", hint);
-    }
-
-    // Stops the rigidbody and (for enemies) turns the colliders off.
-    private void FreezeBody()
-    {
-        Rigidbody2D rb = GetComponent<Rigidbody2D>();
-        if (rb != null)
-        {
-            rb.linearVelocity = Vector2.zero;
-            rb.simulated = false;
-        }
-
-        if (isPlayer) return;
-
-        Collider2D[] colliders = GetComponents<Collider2D>();
-        for (int i = 0; i < colliders.Length; i++)
-        {
-            colliders[i].enabled = false;
-        }
     }
 }

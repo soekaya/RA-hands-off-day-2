@@ -1,6 +1,6 @@
+using System.Collections.Generic;
 using UnityEngine;
 
-// Added automatically by Health. Player: always visible. Enemies: show for a few seconds after being hit.
 public class HealthBar : MonoBehaviour
 {
     private const float Width = 1.1f;
@@ -16,6 +16,8 @@ public class HealthBar : MonoBehaviour
     private GameObject barRoot;
     private Transform fill;
     private SpriteRenderer fillRenderer;
+    private readonly List<GameObject> dividers = new List<GameObject>();
+    private int builtMax;
     private bool alwaysVisible;
     private float showTimer;
     private int lastHealth;
@@ -32,6 +34,7 @@ public class HealthBar : MonoBehaviour
         lastHealth = health != null ? health.CurrentHealth : 0;
 
         Build(top + 0.3f);
+        BuildDividers();
         barRoot.SetActive(alwaysVisible);
     }
 
@@ -47,15 +50,25 @@ public class HealthBar : MonoBehaviour
         SpriteRenderer fillSr = MakeRect("Fill", 0f, Width, Height, EnemyColor, 62);
         fill = fillSr.transform;
         fillRenderer = fillSr;
+    }
 
-        // small dividers so you can count the hits
-        if (health != null && health.MaxHealth > 1 && health.MaxHealth <= 12)
+    // small dividers so you can count the hits (rebuilt when the max HP changes)
+    private void BuildDividers()
+    {
+        for (int i = 0; i < dividers.Count; i++)
         {
-            for (int i = 1; i < health.MaxHealth; i++)
-            {
-                float x = -Width * 0.5f + Width * i / health.MaxHealth;
-                MakeRect("Divider", x, 0.03f, Height, BackColor, 63);
-            }
+            if (dividers[i] != null) Destroy(dividers[i]);
+        }
+        dividers.Clear();
+
+        builtMax = health != null ? health.MaxHealth : 0;
+        if (builtMax <= 1 || builtMax > 12) return;
+
+        for (int i = 1; i < builtMax; i++)
+        {
+            float x = -Width * 0.5f + Width * i / builtMax;
+            SpriteRenderer divider = MakeRect("Divider", x, 0.03f, Height, BackColor, 63);
+            dividers.Add(divider.gameObject);
         }
     }
 
@@ -76,6 +89,11 @@ public class HealthBar : MonoBehaviour
     private void Update()
     {
         if (health == null || barRoot == null) return;
+
+        if (health.MaxHealth != builtMax)
+        {
+            BuildDividers();
+        }
 
         if (health.CurrentHealth != lastHealth)
         {

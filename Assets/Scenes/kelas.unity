@@ -22532,7 +22532,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1914836984}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2b5441b44e939ac4f8deb6a37a013bca, type: 3}
+  m_Script: {fileID: 11500000, guid: f3641984e4c7fbe4cb2891c8b3ca72c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ClassroomGenerator
 --- !u!4 &1914836986

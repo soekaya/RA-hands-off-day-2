@@ -66,7 +66,6 @@ public class WaveManager : MonoBehaviour
 
             float bias = Mathf.Clamp01(CurrentWave / (float)maxWaveEvolution);
 
-            Debug.Log($"Wave {CurrentWave} starting! Target: {TargetEnemyCount}");
             waveStarted?.Invoke(CurrentWave);
             SetSpawners(true, bias);
 
@@ -79,7 +78,6 @@ public class WaveManager : MonoBehaviour
             // the player died: stop the waves
             if (PlayerIsDead()) yield break;
 
-            Debug.Log($"Wave {CurrentWave} completed! {EnemyKilledCount} enemies killed.");
             waveCompleted?.Invoke(CurrentWave);
 
             if (playerHealth != null)

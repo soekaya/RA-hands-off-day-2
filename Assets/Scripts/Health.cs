@@ -7,10 +7,15 @@ public class Health : MonoBehaviour
 
     [Header("Player Only")]
     public float playerInvincibleTime = 0.8f;
-    public AudioSource deathAudioSource; 
-    public AudioClip deathSFX;
-    public AudioSource hitAudioSource;
+
+    // SOUNDS: every prefab (player, enemy, fast enemy, robot...) has its own Health component,
+    [Header("Sounds (this prefab's own)")]
     public AudioClip hitSFX;
+    public AudioClip deathSFX;
+    [Range(0f, 1f)] public float sfxVolume = 1f;
+    [Tooltip("Optional: play this prefab's sounds from its own AudioSource (the player uses this). Empty = use the AudioManager.")]
+    public AudioSource hitAudioSource;
+    public AudioSource deathAudioSource;
     public AudioClip dropSFX;
     [Range(0f, 1f)] public float dropVolume = 0.7f;
     public AudioClip healDropSFX;
@@ -51,8 +56,15 @@ public class Health : MonoBehaviour
 
     private void Awake()
     {
-        currentHealth = maxHealth;
         isPlayer = CompareTag("Player");
+
+        // endless mode: enemies that appear in later waves have more HP
+        if (!isPlayer && CompareTag("Enemy") && WaveManager.Instance != null)
+        {
+            maxHealth = Mathf.Max(1, Mathf.RoundToInt(maxHealth * WaveManager.Instance.EnemyHealthMultiplier));
+        }
+
+        currentHealth = maxHealth;
 
         EnsureFeedback();
 
@@ -80,6 +92,35 @@ public class Health : MonoBehaviour
         {
             feedback = gameObject.AddComponent<HitFeedback>();
         }
+    }
+
+    // One place for all sounds of this object (player and enemies alike).
+    // 1) its own AudioSource if given, 2) the AudioManager, 3) a temporary 2D source.
+    private void PlaySound(AudioClip clip, AudioSource ownSource)
+    {
+        if (clip == null) return;
+
+        if (ownSource != null)
+        {
+            ownSource.PlayOneShot(clip, sfxVolume);
+            return;
+        }
+
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.Sfx(clip).Volume(sfxVolume).RandomPitch(0.95f, 1.05f).Play();
+            return;
+        }
+
+        // survives this object being destroyed
+        GameObject tempAudio = new GameObject("TempAudio");
+        tempAudio.transform.position = transform.position;
+        AudioSource aSource = tempAudio.AddComponent<AudioSource>();
+        aSource.clip = clip;
+        aSource.volume = sfxVolume;
+        aSource.spatialBlend = 0f;
+        aSource.Play();
+        Destroy(tempAudio, clip.length);
     }
 
     // Gives health back (never above max). Returns how much was really healed.
@@ -148,6 +189,8 @@ public class Health : MonoBehaviour
         {
             invincibleUntil = Time.time + playerInvincibleTime;
 
+            PlaySound(hitSFX, hitAudioSource);
+
             feedback.Flash(PlayerHitColor, 0.2f);
             feedback.Shake(0.22f, 0.3f);
             feedback.Blink(playerInvincibleTime);
@@ -164,18 +207,7 @@ public class Health : MonoBehaviour
         }
         else
         {
-            if (hitSFX != null)
-            {
-                GameObject tempAudio = new GameObject("TempHitAudio");
-                tempAudio.transform.position = transform.position;
-                AudioSource aSource = tempAudio.AddComponent<AudioSource>();
-
-                aSource.clip = hitSFX;
-                aSource.spatialBlend = 0f; // FORCE KE 2D (Suara dijamin terdengar keras)
-                aSource.Play();
-
-                Destroy(tempAudio, hitSFX.length);
-            }
+            PlaySound(hitSFX, hitAudioSource);
 
             feedback.Flash(Color.white, 0.1f);
             feedback.Shake(0.12f, 0.15f);
@@ -210,22 +242,11 @@ public class Health : MonoBehaviour
 
         if (CompareTag("Enemy"))
         {
-            if (deathSFX != null)
-            {
-                GameObject tempAudio = new GameObject("TempDeathAudio");
-                tempAudio.transform.position = transform.position;
-                AudioSource aSource = tempAudio.AddComponent<AudioSource>();
-
-                aSource.clip = deathSFX;
-                aSource.spatialBlend = 0f; // FORCE KE 2D (Suara dijamin terdengar keras)
-                aSource.Play();
-
-                Destroy(tempAudio, deathSFX.length);
-            }
+            PlaySound(deathSFX, deathAudioSource);
 
             if (LevelManager.instance != null)
             {
-                LevelManager.instance.AddKill();    
+                LevelManager.instance.AddKill();
             }
 
             // the wave system counts the kills
@@ -322,6 +343,18 @@ public class Health : MonoBehaviour
         // R only works when this scene is in the Build Profiles scene list
         canRestart = Application.CanStreamedLevelBeLoaded(gameObject.scene.name);
         string hint = canRestart ? "Press R to restart" : "Stop and press Play to try again";
+
+        // score line: wave reached, kills, best wave
+        if (WaveManager.Instance != null)
+        {
+            int kills = LevelManager.instance != null ? LevelManager.instance.killCount : 0;
+            string score = "Wave " + WaveManager.Instance.CurrentWave + "     Kills " + kills
+                         + "     Best: Wave " + WaveManager.Instance.BestWave;
+            if (WaveManager.Instance.IsNewBest) score += "   NEW BEST!";
+
+            hint = score + "\n" + hint;
+        }
+
         GameFX.CenterText("YOU DIED", hint);
     }
 }

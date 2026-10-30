@@ -1851,14 +1851,11 @@ MonoBehaviour:
   maxHealth: 10
   playerInvincibleTime: 0.8
   deathAudioSource: {fileID: 0}
-  deathSFX: {fileID: 8300000, guid: ddfc62b35898bc04892c11c7bc837e02, type: 3}
+  deathSFX: {fileID: 8300000, guid: fa0035e75dea5a244a6c97ec3ae61077, type: 3}
   hitAudioSource: {fileID: 0}
   hitSFX: {fileID: 0}
-  dropSFX: {fileID: 8300000, guid: 7ace05e91b7f5f4408be490347a5d540, type: 3}
-  dropVolume: 0.4
-  healDropSFX: {fileID: 8300000, guid: 7ace05e91b7f5f4408be490347a5d540, type: 3}
-  healDropVolume: 0.4
-  bgmSource: {fileID: 0}
+  dropSFX: {fileID: 0}
+  healDropSFX: {fileID: 0}
   damageMultiplier: 1
   dropPrefab: {fileID: 2763300499431770088, guid: e08fe358dae6cb44386ea67e24e1eb41, type: 3}
   dropChance: 0.5

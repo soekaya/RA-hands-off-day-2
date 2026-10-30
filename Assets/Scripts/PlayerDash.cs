@@ -8,11 +8,14 @@ public class PlayerDash : MonoBehaviour
     public float cooldown = 0.8f;
 
     public GameObject smokePrefab;
+    public AudioClip dashSfx;         
+    public float dashVolume = 1f;
     public Vector2 feetOffset = new Vector2(0f, -0.9f);
 
     public bool IsDashing { get; private set; }
 
     private Rigidbody2D rb;
+    private AudioSource audioSource;
     private Health health;
     private SpriteRenderer[] bodyParts;
     private Vector2 lastDirection = Vector2.right;
@@ -25,6 +28,15 @@ public class PlayerDash : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         health = GetComponent<Health>();
+        audioSource = GetComponent<AudioSource>();       
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+            audioSource.playOnAwake = false;
+        }
+        audioSource.spatialBlend = 0f;
+        audioSource.mute = false;     
+        audioSource.volume = 1f;
 
         Transform body = transform.Find("Sprite");
         if (body != null)
@@ -102,6 +114,10 @@ public class PlayerDash : MonoBehaviour
         }
 
         CameraShake.Shake(0.05f, 0.1f);
+        if (dashSfx != null)                                
+        {
+            AudioSource.PlayClipAtPoint(dashSfx, Camera.main.transform.position, dashVolume);
+        }
 
         for (int i = 0; i < 3; i++)
         {

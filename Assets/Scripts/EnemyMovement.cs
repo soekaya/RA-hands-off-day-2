@@ -31,6 +31,14 @@ public class EnemyMovement : MonoBehaviour
     public float recoverTime = 0.8f;
     public float wallStunBonus = 0.8f;   // extra dazed time when it crashes into a wall
     public float laneWidth = 1f;
+    [Header("Sound")]
+    public AudioClip dashSfx;
+    public float dashVolume = 1f;
+    public AudioClip contactSfx;      
+    public float contactVolume = 1f;
+    public AudioClip spawnSfx;
+    public float spawnVolume = 0.6f;
+
 
     private const float WallPadding = 0.7f;
     private static readonly Color DustColor = new Color(0.80f, 0.80f, 0.86f, 1f);
@@ -145,6 +153,10 @@ public class EnemyMovement : MonoBehaviour
         nextContactTime = Time.time + 0.6f; // short grace period right after spawning
 
         GameFX.Burst(transform.position, DustColor, 6, 2.5f, 0.2f, 0.35f, Vector2.zero);
+        if (spawnSfx != null)
+        {
+            AudioSource.PlayClipAtPoint(spawnSfx, Camera.main.transform.position, spawnVolume);
+        }
     }
 
     private void Update()
@@ -277,6 +289,11 @@ public class EnemyMovement : MonoBehaviour
         dashStart = rb.position;
 
         telegraph.Hide();
+
+        if (dashSfx != null)
+        {
+            AudioSource.PlayClipAtPoint(dashSfx, Camera.main.transform.position, dashVolume);
+        }
 
         if (feedback != null)
         {
@@ -459,5 +476,9 @@ public class EnemyMovement : MonoBehaviour
 
         Vector2 dir = (Vector2)(target.transform.position - transform.position);
         target.TakeDamage(contactDamage, dir, contactKnockback);
+        if (contactSfx != null)                                   // <- baru dari sini
+        {
+            AudioSource.PlayClipAtPoint(contactSfx, Camera.main.transform.position, contactVolume);
+        }
     }
 }

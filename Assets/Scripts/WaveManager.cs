@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 
+[RequireComponent(typeof(AudioSource))]
 public class WaveManager : MonoBehaviour
 {
     public static WaveManager Instance { get; private set; }
@@ -16,6 +17,14 @@ public class WaveManager : MonoBehaviour
     [SerializeField] private float timeBetweenWaves = 5f;
     [SerializeField] private float upgradeDelay = 2f;
 
+    [Header("Sound")]
+    [SerializeField] private AudioClip waveStartSfx;
+    [SerializeField] private float waveStartVolume = 1f;
+    [SerializeField] private AudioClip winSfx;
+    [SerializeField] private float winVolume = 1f;
+    [SerializeField] private AudioClip waveClearSfx;
+    [SerializeField] private float waveClearVolume = 1f;
+
     [SerializeField] private UnityEvent<int> waveStarted;
     [SerializeField] private UnityEvent<int> waveCompleted;
     [SerializeField] private UnityEvent allWavesCompleted;
@@ -24,20 +33,23 @@ public class WaveManager : MonoBehaviour
     public int TargetEnemyCount { get; private set; }
     public int SpawnedEnemyCount { get; private set; }
     public int EnemyKilledCount { get; private set; }
-
     public int TotalWaves => totalWaves;
     public bool IsFinished { get; private set; }
 
-    // the Spawner asks this before spawning
-    public bool CanSpawn => SpawnedEnemyCount < TargetEnemyCount
-                            && SpawnedEnemyCount - EnemyKilledCount < maxAliveAtOnce;
+    public bool CanSpawn => SpawnedEnemyCount < TargetEnemyCount && SpawnedEnemyCount - EnemyKilledCount < maxAliveAtOnce;
 
     private Spawner[] spawners;
     private Health playerHealth;
+    private AudioSource myAudioSource;
 
     private void Awake()
     {
         Instance = this;
+
+        myAudioSource = GetComponent<AudioSource>();
+        myAudioSource.playOnAwake = false;
+        myAudioSource.spatialBlend = 0f;
+        myAudioSource.volume = 1f;
     }
 
     private void OnDestroy()
@@ -66,9 +78,15 @@ public class WaveManager : MonoBehaviour
             TargetEnemyCount = baseEnemiesPerWave + (CurrentWave - 1) * enemiesAddedPerWave;
 
             float bias = Mathf.Clamp01(CurrentWave / (float)maxWaveEvolution);
-
             Debug.Log($"Wave {CurrentWave} starting! Target: {TargetEnemyCount}");
+
             waveStarted?.Invoke(CurrentWave);
+
+            if (waveStartSfx != null && myAudioSource != null)
+            {
+                myAudioSource.PlayOneShot(waveStartSfx, waveStartVolume);
+            }
+
             SetSpawners(true, bias);
 
             yield return new WaitUntil(() => SpawnedEnemyCount >= TargetEnemyCount || PlayerIsDead());
@@ -77,11 +95,15 @@ public class WaveManager : MonoBehaviour
 
             yield return new WaitUntil(() => EnemyKilledCount >= SpawnedEnemyCount || PlayerIsDead());
 
-            // the player died: stop the waves
             if (PlayerIsDead()) yield break;
 
             Debug.Log($"Wave {CurrentWave} completed! {EnemyKilledCount} enemies killed.");
             waveCompleted?.Invoke(CurrentWave);
+
+            if (waveClearSfx != null && myAudioSource != null)
+            {
+                myAudioSource.PlayOneShot(waveClearSfx, waveClearVolume);
+            }
 
             if (playerHealth != null)
             {
@@ -90,7 +112,6 @@ public class WaveManager : MonoBehaviour
 
             if (CurrentWave < totalWaves)
             {
-                // the upgrade cards (the next wave waits until you chose or skipped)
                 if (UpgradeManager.Instance != null)
                 {
                     yield return new WaitForSeconds(upgradeDelay);
@@ -104,14 +125,18 @@ public class WaveManager : MonoBehaviour
             }
         }
 
-        // all waves done
         IsFinished = true;
         allWavesCompleted?.Invoke();
+
+        if (winSfx != null && myAudioSource != null)
+        {
+            myAudioSource.PlayOneShot(winSfx, winVolume);
+        }
+
         GameFX.CenterText("CLASS DISMISSED!", "You survived all " + totalWaves + " waves!");
     }
 
     public void RegisterSpawn() => SpawnedEnemyCount++;
-
     public void RegisterKill() => EnemyKilledCount++;
 
     private bool PlayerIsDead()

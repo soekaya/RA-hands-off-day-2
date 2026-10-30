@@ -1830,6 +1830,12 @@ MonoBehaviour:
   recoverTime: 0.8
   wallStunBonus: 0.8
   laneWidth: 1
+  dashSfx: {fileID: 8300000, guid: c97e67f8ec53bf7468f600b340a18795, type: 3}
+  dashVolume: 0.7
+  contactSfx: {fileID: 8300000, guid: 2f204ccdc2e3d684ab7e7773cfaa7161, type: 3}
+  contactVolume: 0.7
+  spawnSfx: {fileID: 8300000, guid: 25df6ddfdbffa9044939b9c08e8fbe95, type: 3}
+  spawnVolume: 0.6
 --- !u!114 &7322718432409334246
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1848,6 +1854,10 @@ MonoBehaviour:
   deathSFX: {fileID: 8300000, guid: fa0035e75dea5a244a6c97ec3ae61077, type: 3}
   hitAudioSource: {fileID: 0}
   hitSFX: {fileID: 0}
+  dropSFX: {fileID: 8300000, guid: 7ace05e91b7f5f4408be490347a5d540, type: 3}
+  dropVolume: 0.4
+  healDropSFX: {fileID: 8300000, guid: 7ace05e91b7f5f4408be490347a5d540, type: 3}
+  healDropVolume: 0.4
   damageMultiplier: 1
   dropPrefab: {fileID: 2763300499431770088, guid: e08fe358dae6cb44386ea67e24e1eb41, type: 3}
   dropChance: 0.5

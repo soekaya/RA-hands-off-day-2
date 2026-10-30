@@ -1402,6 +1402,10 @@ MonoBehaviour:
   deathSFX: {fileID: 8300000, guid: fa0035e75dea5a244a6c97ec3ae61077, type: 3}
   hitAudioSource: {fileID: 0}
   hitSFX: {fileID: 0}
+  dropSFX: {fileID: 8300000, guid: 7ace05e91b7f5f4408be490347a5d540, type: 3}
+  dropVolume: 0.4
+  healDropSFX: {fileID: 8300000, guid: 7ace05e91b7f5f4408be490347a5d540, type: 3}
+  healDropVolume: 0.4
   damageMultiplier: 1
   dropPrefab: {fileID: 2763300499431770088, guid: e08fe358dae6cb44386ea67e24e1eb41, type: 3}
   dropChance: 0.5003
@@ -1465,6 +1469,12 @@ MonoBehaviour:
   beamKnockback: 9
   playerRadius: 0.5
   beamOrigin: {x: 0, y: 0.25}
+  laserSfx: {fileID: 8300000, guid: 3480b4532472fcb4ea708ee5a560a06a, type: 3}
+  laserVolume: 0.6
+  contactSfx: {fileID: 8300000, guid: 2f204ccdc2e3d684ab7e7773cfaa7161, type: 3}
+  contactVolume: 0.7
+  spawnSfx: {fileID: 8300000, guid: a45cdfdfe85d7c44e932d4046235e8e9, type: 3}
+  spawnVolume: 0.5
   overheatTime: 1.8
   overheatDamageMultiplier: 2
 --- !u!1 &3567485713787046184

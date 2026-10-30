@@ -32,6 +32,13 @@ public class RobotEnemy : MonoBehaviour
     public float beamKnockback = 9f;
     public float playerRadius = 0.5f;
     public Vector2 beamOrigin = new Vector2(0f, 0.25f);   // the chest core
+    [Header("Sound")]
+    public AudioClip laserSfx;
+    public float laserVolume = 1f;
+    public AudioClip contactSfx;
+    public float contactVolume = 1f;
+    public AudioClip spawnSfx;
+    [Range(0f, 1f)] public float spawnVolume = 0.5f;
 
     [Header("Overheat (weak point)")]
     public float overheatTime = 1.8f;
@@ -168,6 +175,10 @@ public class RobotEnemy : MonoBehaviour
         nextContactTime = Time.time + 0.6f; // short grace period right after spawning
 
         GameFX.Burst(transform.position, new Color[] { CyanSpark, OrangeSpark }, 8, 3f, 0.15f, 0.4f, Vector2.zero);
+        if (spawnSfx != null)
+        {
+            AudioSource.PlayClipAtPoint(spawnSfx, Camera.main.transform.position, spawnVolume);
+        }
     }
 
     private void Update()
@@ -295,6 +306,10 @@ public class RobotEnemy : MonoBehaviour
         }
 
         CameraShake.Shake(0.08f, sweepTime);
+        if (laserSfx != null)
+        {
+            AudioSource.PlayClipAtPoint(laserSfx, Camera.main.transform.position, laserVolume);
+        }
         GameFX.Burst(Origin, new Color[] { CyanSpark, OrangeSpark }, 8, 4f, 0.15f, 0.4f, Vector2.zero);
     }
 
@@ -536,5 +551,9 @@ public class RobotEnemy : MonoBehaviour
 
         Vector2 dir = (Vector2)(target.transform.position - transform.position);
         target.TakeDamage(contactDamage, dir, contactKnockback);
+        if (contactSfx != null)
+        {
+            AudioSource.PlayClipAtPoint(contactSfx, Camera.main.transform.position, contactVolume);
+        }
     }
 }

@@ -2,17 +2,28 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 
-// Same as the original: only "Wave x / total" and null checks were added.
 public class UIWaveManager : MonoBehaviour
 {
     [SerializeField] private GameObject wavePanel;
     [SerializeField] private TextMeshProUGUI waveText;
     [SerializeField] private float waveTextDuration = 2f;
 
+    private void OnEnable()
+    {
+        WaveManager.WaveStartedEvent += OnWaveStarted;
+        WaveManager.WaveCompletedEvent += OnWaveCompleted;
+    }
+
+    private void OnDisable()
+    {
+        WaveManager.WaveStartedEvent -= OnWaveStarted;
+        WaveManager.WaveCompletedEvent -= OnWaveCompleted;
+    }
+
     public void OnWaveStarted(int waveNumber)
     {
         string text = "Wave " + waveNumber;
-        if (WaveManager.Instance != null)
+        if (WaveManager.Instance != null && !WaveManager.Instance.IsEndless)
         {
             text += " / " + WaveManager.Instance.TotalWaves;
         }
@@ -27,7 +38,13 @@ public class UIWaveManager : MonoBehaviour
 
     private void Show(string text)
     {
-        if (waveText == null) return;
+        Debug.Log("UIWaveManager: showing '" + text + "'");
+
+        if (waveText == null)
+        {
+            Debug.LogWarning("UIWaveManager: 'Wave Text' is not assigned in the Inspector.");
+            return;
+        }
 
         if (wavePanel != null) wavePanel.SetActive(true);
         waveText.text = text;

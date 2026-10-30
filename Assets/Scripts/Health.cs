@@ -7,7 +7,7 @@ public class Health : MonoBehaviour
 
     [Header("Player Only")]
     public float playerInvincibleTime = 0.8f;
-    public AudioSource deathAudioSource; 
+    public AudioSource deathAudioSource;
     public AudioClip deathSFX;
     public AudioSource hitAudioSource;
     public AudioClip hitSFX;
@@ -47,8 +47,15 @@ public class Health : MonoBehaviour
 
     private void Awake()
     {
-        currentHealth = maxHealth;
         isPlayer = CompareTag("Player");
+
+        // endless mode: enemies that appear in later waves have more HP
+        if (!isPlayer && CompareTag("Enemy") && WaveManager.Instance != null)
+        {
+            maxHealth = Mathf.Max(1, Mathf.RoundToInt(maxHealth * WaveManager.Instance.EnemyHealthMultiplier));
+        }
+
+        currentHealth = maxHealth;
 
         EnsureFeedback();
 
@@ -76,6 +83,22 @@ public class Health : MonoBehaviour
         {
             feedback = gameObject.AddComponent<HitFeedback>();
         }
+    }
+
+    // Plays a one-shot 2D sound at this object's position (survives the object being destroyed)
+    private void PlayTempSound(AudioClip clip, string objName)
+    {
+        if (clip == null) return;
+
+        GameObject tempAudio = new GameObject(objName);
+        tempAudio.transform.position = transform.position;
+        AudioSource aSource = tempAudio.AddComponent<AudioSource>();
+
+        aSource.clip = clip;
+        aSource.spatialBlend = 0f; // FORCE KE 2D (Suara dijamin terdengar keras)
+        aSource.Play();
+
+        Destroy(tempAudio, clip.length);
     }
 
     // Gives health back (never above max). Returns how much was really healed.
@@ -156,18 +179,7 @@ public class Health : MonoBehaviour
         }
         else
         {
-            if (hitSFX != null)
-            {
-                GameObject tempAudio = new GameObject("TempHitAudio");
-                tempAudio.transform.position = transform.position;
-                AudioSource aSource = tempAudio.AddComponent<AudioSource>();
-
-                aSource.clip = hitSFX;
-                aSource.spatialBlend = 0f; // FORCE KE 2D (Suara dijamin terdengar keras)
-                aSource.Play();
-
-                Destroy(tempAudio, hitSFX.length);
-            }
+            PlayTempSound(hitSFX, "TempHitAudio");
 
             feedback.Flash(Color.white, 0.1f);
             feedback.Shake(0.12f, 0.15f);
@@ -202,22 +214,11 @@ public class Health : MonoBehaviour
 
         if (CompareTag("Enemy"))
         {
-            if (deathSFX != null)
-            {
-                GameObject tempAudio = new GameObject("TempDeathAudio");
-                tempAudio.transform.position = transform.position;
-                AudioSource aSource = tempAudio.AddComponent<AudioSource>();
-
-                aSource.clip = deathSFX;
-                aSource.spatialBlend = 0f; // FORCE KE 2D (Suara dijamin terdengar keras)
-                aSource.Play();
-
-                Destroy(tempAudio, deathSFX.length);
-            }
+            PlayTempSound(deathSFX, "TempDeathAudio");
 
             if (LevelManager.instance != null)
             {
-                LevelManager.instance.AddKill();    
+                LevelManager.instance.AddKill();
             }
 
             // the wave system counts the kills
@@ -300,6 +301,18 @@ public class Health : MonoBehaviour
         // R only works when this scene is in the Build Profiles scene list
         canRestart = Application.CanStreamedLevelBeLoaded(gameObject.scene.name);
         string hint = canRestart ? "Press R to restart" : "Stop and press Play to try again";
+
+        // score line: wave reached, kills, best wave
+        if (WaveManager.Instance != null)
+        {
+            int kills = LevelManager.instance != null ? LevelManager.instance.killCount : 0;
+            string score = "Wave " + WaveManager.Instance.CurrentWave + "     Kills " + kills
+                         + "     Best: Wave " + WaveManager.Instance.BestWave;
+            if (WaveManager.Instance.IsNewBest) score += "   NEW BEST!";
+
+            hint = score + "\n" + hint;
+        }
+
         GameFX.CenterText("YOU DIED", hint);
     }
 }

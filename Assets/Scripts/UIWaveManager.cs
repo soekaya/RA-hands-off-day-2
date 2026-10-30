@@ -8,6 +8,10 @@ public class UIWaveManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI waveText;
     [SerializeField] private float waveTextDuration = 2f;
 
+    // ignore the same wave arriving twice (code event + Inspector event), so sound/text do not double
+    private int lastStartedWave = -1;
+    private int lastCompletedWave = -1;
+
     private void OnEnable()
     {
         WaveManager.WaveStartedEvent += OnWaveStarted;
@@ -22,6 +26,10 @@ public class UIWaveManager : MonoBehaviour
 
     public void OnWaveStarted(int waveNumber)
     {
+        if (waveNumber == lastStartedWave) return;
+        lastStartedWave = waveNumber;
+        GameSounds.WaveStart();
+
         string text = "Wave " + waveNumber;
         if (WaveManager.Instance != null && !WaveManager.Instance.IsEndless)
         {
@@ -33,6 +41,10 @@ public class UIWaveManager : MonoBehaviour
 
     public void OnWaveCompleted(int waveNumber)
     {
+        if (waveNumber == lastCompletedWave) return;
+        lastCompletedWave = waveNumber;
+        GameSounds.WaveComplete();
+
         Show("Wave " + waveNumber + " Completed!");
     }
 

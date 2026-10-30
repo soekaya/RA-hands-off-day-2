@@ -19549,7 +19549,7 @@ MonoBehaviour:
   maxHealth: 3
   playerInvincibleTime: 0.8
   hitSFX: {fileID: 8300000, guid: 6c2c3d3f4e4d0b449a89864e85cab7d3, type: 3}
-  deathSFX: {fileID: 8300000, guid: 38c4d4cd614053a42b960f78e633d517, type: 3}
+  deathSFX: {fileID: 8300000, guid: 238054459c7ac7a489204389a1958f8b, type: 3}
   sfxVolume: 1
   hitAudioSource: {fileID: 1622456737}
   deathAudioSource: {fileID: 1622456735}

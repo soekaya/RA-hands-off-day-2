@@ -37,6 +37,7 @@ public class AudioManager : MonoBehaviour
         {
             AudioSource src = gameObject.AddComponent<AudioSource>();
             src.playOnAwake = false;
+            src.ignoreListenerPause = true;   // menu clicks must still play while the game is paused
             sfxSources.Add(src);
         }
     }

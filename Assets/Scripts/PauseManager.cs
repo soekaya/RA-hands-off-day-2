@@ -18,6 +18,7 @@ public class PauseManager : MonoBehaviour
         if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
         {
             SetPaused(!isPaused);
+            GameSounds.Click();
         }
     }
 
@@ -42,10 +43,12 @@ public class PauseManager : MonoBehaviour
     public void Resume()
     {
         SetPaused(false);
+        GameSounds.Click();
     }
 
     public void ReloadScene()
     {
+        GameSounds.Click();
         Time.timeScale = 1f;
         AudioListener.pause = false;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
@@ -53,6 +56,7 @@ public class PauseManager : MonoBehaviour
 
     public void BackToMainMenu()
     {
+        GameSounds.Click();
         Time.timeScale = 1f;
         AudioListener.pause = false;
         SceneManager.LoadScene(mainMenuScene);

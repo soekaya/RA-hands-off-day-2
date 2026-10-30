@@ -6,7 +6,6 @@ using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-
 public class MainMenuManager : MonoBehaviour
 {
     public const string VolumeKey = "MasterVolume";
@@ -73,6 +72,7 @@ public class MainMenuManager : MonoBehaviour
 
     public void Play()
     {
+        GameSounds.Click();
         Time.timeScale = 1f;
         SceneManager.LoadScene(gameScene);
     }
@@ -88,12 +88,14 @@ public class MainMenuManager : MonoBehaviour
 
     private void OpenSettings()
     {
+        GameSounds.Click();
         ClearSelection();
         settingsPanel.SetActive(true);
     }
 
     private void CloseSettings()
     {
+        GameSounds.Click();
         ClearSelection();
         settingsPanel.SetActive(false);
     }

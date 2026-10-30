@@ -9,6 +9,7 @@ public class Health : MonoBehaviour
     public float playerInvincibleTime = 0.8f;
 
     // SOUNDS: every prefab (player, enemy, fast enemy, robot...) has its own Health component,
+
     [Header("Sounds (this prefab's own)")]
     public AudioClip hitSFX;
     public AudioClip deathSFX;
@@ -17,11 +18,7 @@ public class Health : MonoBehaviour
     public AudioSource hitAudioSource;
     public AudioSource deathAudioSource;
     public AudioClip dropSFX;
-    [Range(0f, 1f)] public float dropVolume = 0.7f;
     public AudioClip healDropSFX;
-    [Range(0f, 1f)] public float healDropVolume = 0.7f;
-    public AudioSource bgmSource;
-    [Range(0f, 1f)] public float playerHitVolume = 0.7f;
 
     [Header("Weak Point")]
     public float damageMultiplier = 1f;   // the robot sets this to 2 while it is overheated
@@ -200,10 +197,6 @@ public class Health : MonoBehaviour
 
             CameraShake.Shake(0.3f, 0.3f);
             CameraShake.HitStop(0.07f);
-            if (hitSFX != null)
-            {
-                AudioSource.PlayClipAtPoint(hitSFX, Camera.main.transform.position, playerHitVolume);
-            }
         }
         else
         {
@@ -264,22 +257,12 @@ public class Health : MonoBehaviour
         if (dropPrefab != null && Random.value <= dropChance)
         {
             Instantiate(dropPrefab, transform.position, Quaternion.identity);
-
-            if (dropSFX != null)
-            {
-                AudioSource.PlayClipAtPoint(dropSFX, Camera.main.transform.position, dropVolume);
-            }
         }
 
         // a second, separate drop: the heal item (each one has its own chance)
         if (healDropPrefab != null && Random.value <= healDropChance)
         {
             Instantiate(healDropPrefab, transform.position, Quaternion.identity);
-
-            if (healDropSFX != null)
-            {
-                AudioSource.PlayClipAtPoint(healDropSFX, Camera.main.transform.position, healDropVolume);
-            }
         }
 
         // stop everything, show the white flash for a moment, then remove
@@ -324,14 +307,11 @@ public class Health : MonoBehaviour
             rb.simulated = false;
         }
 
-        if (deathAudioSource != null && deathSFX != null)
-        {
-            deathAudioSource.PlayOneShot(deathSFX);
-        }
-        if (bgmSource != null)
-        {
-            bgmSource.Stop();
-        }
+        PlaySound(deathSFX, deathAudioSource);
+
+        // game over sting + the music fades out
+        GameSounds.GameOver();
+        if (AudioManager.Instance != null) AudioManager.Instance.StopMusic(1f);
 
         Vector3 bodyPos = transform.position + Vector3.up * (feedback.TopOffset * 0.5f);
         GameFX.Burst(bodyPos, feedback.OriginalColors, 28, 8f, 0.25f, 0.9f, Vector2.zero);

@@ -66,13 +66,14 @@ public static class GameFX
         go.transform.position = new Vector3(position.x + Random.Range(-0.3f, 0.3f), position.y, 0f);
 
         TextMeshPro tmp = go.AddComponent<TextMeshPro>();
+        tmp.font = Resources.Load<TMP_FontAsset>("Fonts/BoldPixels SDF");
+        tmp.fontSharedMaterial = Resources.Load<Material>("Fonts/BoldPixels SDF Outline");
         tmp.text = text;
         tmp.fontSize = size;
         tmp.fontStyle = FontStyles.Bold;
         tmp.alignment = TextAlignmentOptions.Center;
         tmp.color = color;
         tmp.outlineWidth = 0.25f;
-        tmp.outlineColor = new Color32(25, 20, 30, 255);
         tmp.rectTransform.sizeDelta = new Vector2(6f, 2f);
         go.GetComponent<MeshRenderer>().sortingOrder = 200;
 
@@ -102,8 +103,9 @@ public static class GameFX
     {
         GameObject go = new GameObject(objName);
         go.transform.position = position;
-
+        
         TextMeshPro tmp = go.AddComponent<TextMeshPro>();
+        tmp.font = TMP_Settings.defaultFontAsset;
         tmp.text = text;
         tmp.fontSize = size;
         tmp.fontStyle = FontStyles.Bold;

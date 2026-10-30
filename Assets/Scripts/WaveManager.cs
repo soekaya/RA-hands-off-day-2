@@ -30,6 +30,20 @@ public class WaveManager : MonoBehaviour
     [SerializeField] private float upgradeDelay = 2f;
     [SerializeField] private int upgradeEveryNWaves = 3;   // the shop opens after wave 3, 6, 9... (set 1 = every wave)
 
+    [Header("Spawn Timing")]
+    [SerializeField] private AnimationCurve spawnIntervalCurve = new AnimationCurve(
+        new Keyframe(0f, 2f),
+        new Keyframe(1f, 0.5f)
+    );
+
+    [Header("Sound")]
+    [SerializeField] private AudioClip waveStartSfx;
+    [SerializeField] private float waveStartVolume = 1f;
+    [SerializeField] private AudioClip winSfx;
+    [SerializeField] private float winVolume = 1f;
+    [SerializeField] private AudioClip waveClearSfx;
+    [SerializeField] private float waveClearVolume = 1f;
+
     [SerializeField] private UnityEvent<int> waveStarted;
     [SerializeField] private UnityEvent<int> waveCompleted;
     [SerializeField] private UnityEvent allWavesCompleted;
@@ -38,7 +52,6 @@ public class WaveManager : MonoBehaviour
     public int TargetEnemyCount { get; private set; }
     public int SpawnedEnemyCount { get; private set; }
     public int EnemyKilledCount { get; private set; }
-
     public int TotalWaves => totalWaves;
     public bool IsEndless => endless;
     public bool IsBossWave { get; private set; }
@@ -73,7 +86,7 @@ public class WaveManager : MonoBehaviour
     private IEnumerator Start()
     {
         spawners = FindObjectsByType<Spawner>(FindObjectsSortMode.None);
-        SetSpawners(false, 0f);
+        SetSpawners(false, 0f, EvaluateSpawnInterval(0f));
 
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player != null)
@@ -97,14 +110,22 @@ public class WaveManager : MonoBehaviour
                 TargetEnemyCount = 1 + TargetEnemyCount / 2;
             }
 
-            float bias = Mathf.Clamp01(CurrentWave / (float)maxWaveEvolution);
+            float progress = maxWaveEvolution <= 1
+                ? 1f
+                : Mathf.InverseLerp(1f, maxWaveEvolution, CurrentWave);
+            float bias = progress;
+            float spawnInterval = EvaluateSpawnInterval(progress);
 
             SaveBestWave();
 
             Debug.Log($"Wave {CurrentWave} starting! Target: {TargetEnemyCount}");
+
             waveStarted?.Invoke(CurrentWave);
+
+            PlaySfx(waveStartSfx, waveStartVolume);
+
             WaveStartedEvent?.Invoke(CurrentWave);
-            SetSpawners(true, bias);
+            SetSpawners(true, bias, spawnInterval);
 
             if (IsBossWave)
             {
@@ -113,16 +134,17 @@ public class WaveManager : MonoBehaviour
 
             yield return new WaitUntil(() => SpawnedEnemyCount >= TargetEnemyCount || PlayerIsDead());
 
-            SetSpawners(false, bias);
+            SetSpawners(false, bias, spawnInterval);
 
             yield return new WaitUntil(() => EnemyKilledCount >= SpawnedEnemyCount || PlayerIsDead());
 
-            // the player died: stop the waves
             if (PlayerIsDead()) yield break;
 
             Debug.Log($"Wave {CurrentWave} completed! {EnemyKilledCount} enemies killed.");
             waveCompleted?.Invoke(CurrentWave);
             WaveCompletedEvent?.Invoke(CurrentWave);
+
+            PlaySfx(waveClearSfx, waveClearVolume);
 
             if (playerHealth != null)
             {
@@ -155,9 +177,11 @@ public class WaveManager : MonoBehaviour
             }
         }
 
-        // all waves done
         IsFinished = true;
         allWavesCompleted?.Invoke();
+
+        PlaySfx(winSfx, winVolume);
+
         GameFX.CenterText("CLASS DISMISSED!", "You survived all " + totalWaves + " waves!");
     }
 
@@ -202,7 +226,6 @@ public class WaveManager : MonoBehaviour
     }
 
     public void RegisterSpawn() => SpawnedEnemyCount++;
-
     public void RegisterKill() => EnemyKilledCount++;
 
     private bool PlayerIsDead()
@@ -210,13 +233,31 @@ public class WaveManager : MonoBehaviour
         return playerHealth != null && playerHealth.IsDead;
     }
 
-    private void SetSpawners(bool active, float bias)
+    private void SetSpawners(bool active, float bias, float spawnInterval)
     {
         foreach (Spawner spawner in spawners)
         {
             if (spawner == null) continue;
             spawner.EnemyBias = bias;
+            spawner.SetSpawnInterval(spawnInterval);
             spawner.enabled = active;
         }
+    }
+
+    private float EvaluateSpawnInterval(float progress)
+    {
+        if (spawnIntervalCurve == null || spawnIntervalCurve.length == 0)
+        {
+            return 1f;
+        }
+
+        return Mathf.Max(0.01f, spawnIntervalCurve.Evaluate(Mathf.Clamp01(progress)));
+    }
+
+    private void PlaySfx(AudioClip clip, float volume)
+    {
+        if (clip == null || AudioManager.Instance == null) return;
+
+        AudioManager.Instance.Sfx(clip).Volume(volume).Play();
     }
 }

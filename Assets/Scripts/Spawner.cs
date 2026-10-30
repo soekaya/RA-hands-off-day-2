@@ -25,6 +25,11 @@ public class Spawner : MonoBehaviour
     private float spawnTimer;
     private readonly List<GameObject> alive = new List<GameObject>();
 
+    public void SetSpawnInterval(float interval)
+    {
+        spawnInterval = Mathf.Max(0.01f, interval);
+    }
+
     private void Update()
     {
         if (enemies == null || enemies.Length == 0 || target == null)

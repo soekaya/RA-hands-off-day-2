@@ -9623,6 +9623,36 @@ MonoBehaviour:
   timeBetweenWaves: 5
   upgradeDelay: 2
   upgradeEveryNWaves: 3
+  spawnIntervalCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 2
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0.75
+      inSlope: -4.8571396
+      outSlope: -4.8571396
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.037500024
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  waveStartSfx: {fileID: 0}
+  waveStartVolume: 1
+  winSfx: {fileID: 0}
+  winVolume: 1
+  waveClearSfx: {fileID: 0}
+  waveClearVolume: 1
   waveStarted:
     m_PersistentCalls:
       m_Calls:
@@ -19524,7 +19554,11 @@ MonoBehaviour:
   hitAudioSource: {fileID: 1622456737}
   deathAudioSource: {fileID: 1622456735}
   dropSFX: {fileID: 0}
+  dropVolume: 0.7
   healDropSFX: {fileID: 0}
+  healDropVolume: 0.7
+  bgmSource: {fileID: 0}
+  playerHitVolume: 0.7
   damageMultiplier: 1
   dropPrefab: {fileID: 0}
   dropChance: 0.5
@@ -26700,3 +26734,4 @@ SceneRoots:
   - {fileID: 1402316204}
   - {fileID: 723707788}
   - {fileID: 681869334}
+  - {fileID: 1645661004}

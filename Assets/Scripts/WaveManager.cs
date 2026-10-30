@@ -28,7 +28,7 @@ public class WaveManager : MonoBehaviour
     [SerializeField] private float initialDelay = 2f;
     [SerializeField] private float timeBetweenWaves = 5f;
     [SerializeField] private float upgradeDelay = 2f;
-    [SerializeField] private int upgradeEveryNWaves = 3;   // the shop opens after wave 3, 6, 9... (set 1 = every wave)
+    [SerializeField] private int upgradeEveryNWaves = 1;   
 
     [Header("Spawn Timing")]
     [SerializeField] private AnimationCurve spawnIntervalCurve = new AnimationCurve(

@@ -17472,7 +17472,7 @@ MonoBehaviour:
   minSpawnDistance: 7.6
   maxAlive: 12
   EnemyBias: 0
-  stdDev: 0.15
+  stdDev: 0.25
   limitToOneStdDev: 0
   limitToRoom: 1
   roomCenter: {x: 0, y: 0}

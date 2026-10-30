@@ -53,9 +53,9 @@ public class UpgradeManager : MonoBehaviour
         // name, description, cost, max times you can buy it, type, card color
         Add("Akimbo", "A second gun.\nBoth shoot at once.", 12, 1, UpgradeType.Akimbo, weapon);
         Add("Orbit Sword", "A sword spins around\nyou and cuts enemies.", 10, 3, UpgradeType.Sword, Gold);
-        Add("Heart Container", "+1 max HP\nand heal 1 HP.", 8, 3, UpgradeType.MaxHealth, health);
-        Add("Quick Trigger", "Shoot 20% faster.", 6, 3, UpgradeType.FireRate, weapon);
-        Add("Sharp Bullets", "Bullets do +1 damage.", 9, 3, UpgradeType.Damage, weapon);
+        Add("Heart Container", "+1 max HP\nand heal 1 HP.", 8, 5, UpgradeType.MaxHealth, health);
+        Add("Quick Trigger", "Shoot 20% faster.", 6, 5, UpgradeType.FireRate, weapon);
+        Add("Sharp Bullets", "Bullets do +1 damage.", 9, 6, UpgradeType.Damage, weapon);
         Add("Light Boots", "Move 15% faster.", 5, 3, UpgradeType.MoveSpeed, speed);
         Add("Dash Boots", "Dash comes back\n20% sooner.", 5, 3, UpgradeType.DashCooldown, speed);
         Add("Snack", "Heal 2 HP now.", 4, 99, UpgradeType.Snack, health);
@@ -90,7 +90,11 @@ public class UpgradeManager : MonoBehaviour
             return;
         }
 
-        if (!FindPlayer()) return;
+        if (!FindPlayer())
+        {
+            Debug.LogError("UpgradeManager: no object with the 'Player' tag found.");
+            return;
+        }
 
         if (bonusCoinsPerWave > 0 && LevelManager.instance != null)
         {
@@ -99,7 +103,11 @@ public class UpgradeManager : MonoBehaviour
         }
 
         PickCards();
-        if (offered.Count == 0) return;
+        if (offered.Count == 0)
+        {
+            Debug.LogWarning("UpgradeManager: no upgrades available to offer.");
+            return;
+        }
 
         IsOpen = true;
         SetGuns(false);

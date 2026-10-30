@@ -1,6 +1,8 @@
 using UnityEngine;
 using TMPro;
 
+// Put this on the "ChalkStats" object (inside Classroom > WallDecor).
+// It shows the wave, kills and coins on the blackboard.
 public class ChalkboardStats : MonoBehaviour
 {
     private TextMeshPro text;
@@ -42,10 +44,12 @@ public class ChalkboardStats : MonoBehaviour
 
     private string BuildTitle(int wave, bool finished)
     {
-        if (WaveManager.Instance == null) return "SURVIVE THE CLASS";
-        if (finished) return "CLASS DISMISSED!";
-        if (wave <= 0) return "GET READY";
+        if (WaveManager.Instance == null) return "FILKOM UB - SURVIVE THE CLASS";
+        if (finished) return "FILKOM UB - CLASS DISMISSED!";
+        if (wave <= 0) return "FILKOM UB - GET READY";
 
-        return "WAVE " + wave + "/" + WaveManager.Instance.TotalWaves;
+        if (WaveManager.Instance.IsEndless) return "FILKOM UB - WAVE " + wave;
+
+        return "FILKOM UB - WAVE " + wave + "/" + WaveManager.Instance.TotalWaves;
     }
 }

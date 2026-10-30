@@ -8645,6 +8645,54 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!1 &723707786
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 723707788}
+  - component: {fileID: 723707787}
+  m_Layer: 0
+  m_Name: UpgradeManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &723707787
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 723707786}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75ee0893ff4669444a1526aa2117bb4f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UpgradeManager
+  cardPrefab: {fileID: 5558177598319339727, guid: 43e359b670b11f34bacb1edc0e5a3811, type: 3}
+  swordPrefab: {fileID: 5207166773587342942, guid: 5b2ec34dac950ae4cbf6b7969afd1a52, type: 3}
+  cardsToShow: 3
+  bonusCoinsPerWave: 3
+--- !u!4 &723707788
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 723707786}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.02175, y: -0.07752, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &732473737
 GameObject:
   m_ObjectHideFlags: 0
@@ -9358,15 +9406,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2bb7162e6771b524193c4fc4da242514, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WaveManager
+  endless: 1
   totalWaves: 10
   maxWaveEvolution: 5
   baseEnemiesPerWave: 5
   enemiesAddedPerWave: 5
   maxAliveAtOnce: 10
+  maxAliveLimit: 25
+  healthPerWave: 0.08
   healPerWave: 1
+  bossPrefab: {fileID: 0}
+  bossEveryNWaves: 5
+  bossSpawnPoint: {x: 6, y: 1}
+  bossRewardCoins: 15
   initialDelay: 2
   timeBetweenWaves: 5
   upgradeDelay: 2
+  upgradeEveryNWaves: 3
   waveStarted:
     m_PersistentCalls:
       m_Calls:
@@ -19262,10 +19318,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Health
   maxHealth: 3
   playerInvincibleTime: 0.8
-  deathAudioSource: {fileID: 1622456736}
+  deathAudioSource: {fileID: 1622456735}
   deathSFX: {fileID: 8300000, guid: 38c4d4cd614053a42b960f78e633d517, type: 3}
   hitAudioSource: {fileID: 1622456737}
-  hitSFX: {fileID: 8300000, guid: e177aa4f2a882d5418135fd0be4b442c, type: 3}
+  hitSFX: {fileID: 8300000, guid: 6c2c3d3f4e4d0b449a89864e85cab7d3, type: 3}
   dropSFX: {fileID: 0}
   healDropSFX: {fileID: 0}
   damageMultiplier: 1
@@ -19314,7 +19370,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 8300000, guid: a24bd799dd1ca2c46a97f3eb85fa7812, type: 3}
+  m_Resource: {fileID: 8300000, guid: a861ad848eb2466408d278751cae6239, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 0.52
   m_Pitch: 1
@@ -26081,3 +26137,4 @@ SceneRoots:
   - {fileID: 664201347}
   - {fileID: 1695442122}
   - {fileID: 1402316204}
+  - {fileID: 723707788}

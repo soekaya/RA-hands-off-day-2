@@ -7,10 +7,15 @@ public class Health : MonoBehaviour
 
     [Header("Player Only")]
     public float playerInvincibleTime = 0.8f;
-    public AudioSource deathAudioSource;
-    public AudioClip deathSFX;
-    public AudioSource hitAudioSource;
+
+    // SOUNDS: every prefab (player, enemy, fast enemy, robot...) has its own Health component,
+    [Header("Sounds (this prefab's own)")]
     public AudioClip hitSFX;
+    public AudioClip deathSFX;
+    [Range(0f, 1f)] public float sfxVolume = 1f;
+    [Tooltip("Optional: play this prefab's sounds from its own AudioSource (the player uses this). Empty = use the AudioManager.")]
+    public AudioSource hitAudioSource;
+    public AudioSource deathAudioSource;
     public AudioClip dropSFX;
     public AudioClip healDropSFX;
 
@@ -85,19 +90,32 @@ public class Health : MonoBehaviour
         }
     }
 
-    // Plays a one-shot 2D sound at this object's position (survives the object being destroyed)
-    private void PlayTempSound(AudioClip clip, string objName)
+    // One place for all sounds of this object (player and enemies alike).
+    // 1) its own AudioSource if given, 2) the AudioManager, 3) a temporary 2D source.
+    private void PlaySound(AudioClip clip, AudioSource ownSource)
     {
         if (clip == null) return;
 
-        GameObject tempAudio = new GameObject(objName);
+        if (ownSource != null)
+        {
+            ownSource.PlayOneShot(clip, sfxVolume);
+            return;
+        }
+
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.Sfx(clip).Volume(sfxVolume).RandomPitch(0.95f, 1.05f).Play();
+            return;
+        }
+
+        // survives this object being destroyed
+        GameObject tempAudio = new GameObject("TempAudio");
         tempAudio.transform.position = transform.position;
         AudioSource aSource = tempAudio.AddComponent<AudioSource>();
-
         aSource.clip = clip;
-        aSource.spatialBlend = 0f; // FORCE KE 2D (Suara dijamin terdengar keras)
+        aSource.volume = sfxVolume;
+        aSource.spatialBlend = 0f;
         aSource.Play();
-
         Destroy(tempAudio, clip.length);
     }
 
@@ -167,6 +185,8 @@ public class Health : MonoBehaviour
         {
             invincibleUntil = Time.time + playerInvincibleTime;
 
+            PlaySound(hitSFX, hitAudioSource);
+
             feedback.Flash(PlayerHitColor, 0.2f);
             feedback.Shake(0.22f, 0.3f);
             feedback.Blink(playerInvincibleTime);
@@ -179,7 +199,7 @@ public class Health : MonoBehaviour
         }
         else
         {
-            PlayTempSound(hitSFX, "TempHitAudio");
+            PlaySound(hitSFX, hitAudioSource);
 
             feedback.Flash(Color.white, 0.1f);
             feedback.Shake(0.12f, 0.15f);
@@ -214,7 +234,7 @@ public class Health : MonoBehaviour
 
         if (CompareTag("Enemy"))
         {
-            PlayTempSound(deathSFX, "TempDeathAudio");
+            PlaySound(deathSFX, deathAudioSource);
 
             if (LevelManager.instance != null)
             {
@@ -286,10 +306,7 @@ public class Health : MonoBehaviour
             rb.simulated = false;
         }
 
-        if (deathAudioSource != null && deathSFX != null)
-        {
-            deathAudioSource.PlayOneShot(deathSFX);
-        }
+        PlaySound(deathSFX, deathAudioSource);
 
         Vector3 bodyPos = transform.position + Vector3.up * (feedback.TopOffset * 0.5f);
         GameFX.Burst(bodyPos, feedback.OriginalColors, 28, 8f, 0.25f, 0.9f, Vector2.zero);

@@ -66,16 +66,10 @@ public class WaveManager : MonoBehaviour
 
     private Spawner[] spawners;
     private Health playerHealth;
-    private AudioSource myAudioSource;
 
     private void Awake()
     {
         Instance = this;
-
-        myAudioSource = GetComponent<AudioSource>();
-        myAudioSource.playOnAwake = false;
-        myAudioSource.spatialBlend = 0f;
-        myAudioSource.volume = 1f;
     }
 
     private void OnDestroy()
@@ -118,10 +112,7 @@ public class WaveManager : MonoBehaviour
 
             waveStarted?.Invoke(CurrentWave);
 
-            if (waveStartSfx != null && myAudioSource != null)
-            {
-                myAudioSource.PlayOneShot(waveStartSfx, waveStartVolume);
-            }
+            PlaySfx(waveStartSfx, waveStartVolume);
 
             WaveStartedEvent?.Invoke(CurrentWave);
             SetSpawners(true, bias);
@@ -143,10 +134,7 @@ public class WaveManager : MonoBehaviour
             waveCompleted?.Invoke(CurrentWave);
             WaveCompletedEvent?.Invoke(CurrentWave);
 
-            if (waveClearSfx != null && myAudioSource != null)
-            {
-                myAudioSource.PlayOneShot(waveClearSfx, waveClearVolume);
-            }
+            PlaySfx(waveClearSfx, waveClearVolume);
 
             if (playerHealth != null)
             {
@@ -182,10 +170,7 @@ public class WaveManager : MonoBehaviour
         IsFinished = true;
         allWavesCompleted?.Invoke();
 
-        if (winSfx != null && myAudioSource != null)
-        {
-            myAudioSource.PlayOneShot(winSfx, winVolume);
-        }
+        PlaySfx(winSfx, winVolume);
 
         GameFX.CenterText("CLASS DISMISSED!", "You survived all " + totalWaves + " waves!");
     }
@@ -246,5 +231,12 @@ public class WaveManager : MonoBehaviour
             spawner.EnemyBias = bias;
             spawner.enabled = active;
         }
+    }
+
+    private void PlaySfx(AudioClip clip, float volume)
+    {
+        if (clip == null || AudioManager.Instance == null) return;
+
+        AudioManager.Instance.Sfx(clip).Volume(volume).Play();
     }
 }

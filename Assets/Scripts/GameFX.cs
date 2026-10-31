@@ -105,8 +105,8 @@ public static class GameFX
         go.transform.position = position;
         
         TextMeshPro tmp = go.AddComponent<TextMeshPro>();
-        tmp.font = TMP_Settings.defaultFontAsset;
         tmp.text = text;
+        tmp.font = Resources.Load<TMP_FontAsset>("Fonts/BoldPixels SDF");
         tmp.fontSize = size;
         tmp.fontStyle = FontStyles.Bold;
         tmp.alignment = TextAlignmentOptions.Center;

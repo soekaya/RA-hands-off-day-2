@@ -68,8 +68,6 @@ public class MainMenuManager : MonoBehaviour
         }
     }
 
-    // ------------------------------------------------------------------ buttons
-
     public void Play()
     {
         GameSounds.Click();
@@ -111,8 +109,6 @@ public class MainMenuManager : MonoBehaviour
         PlayerPrefs.SetFloat(VolumeKey, value);
         if (volumeValueText != null) volumeValueText.text = Mathf.RoundToInt(value * 100f) + "%";
     }
-
-    // ------------------------------------------------------------------ building the screens
 
     private void CopyFontFromScene()
     {
@@ -196,8 +192,6 @@ public class MainMenuManager : MonoBehaviour
 
         panel.SetActive(false);
     }
-
-    // ------------------------------------------------------------------ small UI helpers
 
     private RectTransform MakeRect(string name, Transform parent, Vector2 anchor, Vector2 position, Vector2 size)
     {
